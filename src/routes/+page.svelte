@@ -65,11 +65,12 @@
 		{#each [...notes] as note, index}
 			<g>
 				<circle
-					style="fill:url(#toning);stroke-width:1.6871;stroke-miterlimit:10;"
+					style="stroke-width:1.6871;stroke-miterlimit:10;"
 					cx={getNotePosition(index).x}
 					cy={getNotePosition(index).y}
 					r={30}
 					stroke="black"
+					fill="transparent"
 					class={isInIonianScale(index, rootNoteIndex) ? 'visible' : 'hidden'}
 				/>
 				<text
@@ -86,12 +87,13 @@
 		{#each [...ionianScale] as scaleNote}
 			<g>
 				<circle
-					style="fill:url(#toning);stroke-width:1.6871;stroke-miterlimit:10;"
+					style="stroke-width:1.6871;stroke-miterlimit:10;"
 					cx={getScaleNotePosition(scaleNote, rootNoteIndex).x}
 					cy={getScaleNotePosition(scaleNote, rootNoteIndex).y}
 					r={30}
 					stroke="black"
 					class="hidden"
+					fill="transparent"
 				/>
 				<text
 					x={getScaleNotePosition(scaleNote, rootNoteIndex).x}
