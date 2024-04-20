@@ -7,7 +7,7 @@
 		y: 400
 	};
 
-	let rootNoteIndex = 4;
+	let rootNoteIndex = 0;
 
 	const getNoteString = (note: Note) => {
 		if (note.preferSharp) {
@@ -45,7 +45,7 @@
 	};
 
 	const isInIonianScale = (noteIndex: number, rootNoteIndex: number) => {
-		let semitonesFromRoot = noteIndex - rootNoteIndex;
+		let semitonesFromRoot = (noteIndex - rootNoteIndex) % notes.length;
 		if (semitonesFromRoot < 0) {
 			semitonesFromRoot = semitonesFromRoot + notes.length;
 		}
@@ -59,7 +59,8 @@
 			cx={circleCentre.x}
 			cy={circleCentre.y}
 			r={circleRadius + 30}
-			stroke="black"
+			stroke="grey"
+			stroke-width={1}
 			fill="transparent"
 		/>
 		{#each [...notes] as note, index}
@@ -91,7 +92,6 @@
 					cx={getScaleNotePosition(scaleNote, rootNoteIndex).x}
 					cy={getScaleNotePosition(scaleNote, rootNoteIndex).y}
 					r={30}
-					stroke="black"
 					class="hidden"
 					fill="transparent"
 				/>
@@ -106,7 +106,7 @@
 		{/each}
 	</svg>
 
-	<input type="number" min={0} max={11} bind:value={rootNoteIndex} />
+	<input type="number" bind:value={rootNoteIndex} />
 </div>
 
 <style>
@@ -114,8 +114,8 @@
 		display: block;
 		margin-left: auto;
 		margin-right: auto;
-		width: 500px;
-		height: 500px;
+		width: 400px;
+		height: 400px;
 	}
 
 	#boxOfNotes {
