@@ -64,7 +64,7 @@
 			fill="transparent"
 		/>
 		{#each [...notes] as note, index}
-			<g>
+			<g class="transitionNote">
 				<circle
 					style="stroke-width:1.6871;stroke-miterlimit:10;"
 					cx={getNotePosition(index).x}
@@ -72,7 +72,9 @@
 					r={30}
 					stroke="black"
 					fill="transparent"
-					class={isInIonianScale(index, rootNoteIndex) ? 'visible' : 'hidden'}
+					class={isInIonianScale(index, rootNoteIndex)
+						? 'transitionNote visible'
+						: 'transitionNote hidden'}
 				/>
 				<text
 					x={getNotePosition(index).x}
@@ -86,27 +88,53 @@
 			</g>
 		{/each}
 		{#each [...ionianScale] as scaleNote}
-			<g>
+			<g class="transitionNote">
 				<circle
 					style="stroke-width:1.6871;stroke-miterlimit:10;"
-					cx={getScaleNotePosition(scaleNote, rootNoteIndex).x}
-					cy={getScaleNotePosition(scaleNote, rootNoteIndex).y}
+					cx={getScaleNotePosition(scaleNote, 0).x}
+					cy={getScaleNotePosition(scaleNote, 0).y}
 					r={30}
+					transform={`rotate(${(rootNoteIndex * 360) / notes.length} ${circleCentre.x} ${
+						circleCentre.y
+					})`}
 					class="hidden"
 					fill="transparent"
 				/>
 				<text
-					x={getScaleNotePosition(scaleNote, rootNoteIndex).x}
-					y={getScaleNotePosition(scaleNote, rootNoteIndex).y}
+					x={getScaleNotePosition(scaleNote, 0).x}
+					y={getScaleNotePosition(scaleNote, 0).y}
 					text-anchor="middle"
 					dy=".3em"
+					transform={`rotate(${(rootNoteIndex * 360) / notes.length} ${circleCentre.x} ${
+						circleCentre.y
+					})`}
 					class="svgNoteName scaleNote">{scaleNote.label}</text
 				>
 			</g>
 		{/each}
 	</svg>
 
-	<input type="number" bind:value={rootNoteIndex} />
+	{getNoteString(notes[rootNoteIndex])}
+	<button
+		on:click={() => {
+			rootNoteIndex = rootNoteIndex - 1;
+			if (rootNoteIndex < 0) {
+				rootNoteIndex = rootNoteIndex + 12;
+			}
+		}}
+	>
+		-
+	</button>
+	<button
+		on:click={() => {
+			rootNoteIndex = rootNoteIndex + 1;
+			if (rootNoteIndex >= 12) {
+				rootNoteIndex = rootNoteIndex - 12;
+			}
+		}}
+	>
+		+
+	</button>
 </div>
 
 <style>
@@ -140,10 +168,19 @@
 
 	.scaleNote {
 		font-weight: bold;
+		transition: all 700ms ease-in-out;
 	}
 
 	.hidden {
-		fill: transparent;
-		stroke: transparent;
+		opacity: 0;
+	}
+
+	.transitionNote {
+		opacity: 1;
+		transition: opacity 0.25s linear;
+	}
+
+	.transitionNote.hidden {
+		opacity: 0;
 	}
 </style>
