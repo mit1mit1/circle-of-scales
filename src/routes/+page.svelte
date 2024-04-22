@@ -165,6 +165,7 @@
 					selectedScale = diatonicScale;
 					rootNoteIndex = getPositiveModulo(relativeIndex, notes.length);
 				}}
+				class={diatonicScale === selectedScale ? 'selectedTab' : ''}
 			>
 				<span class="noteLabel"
 					>{getNoteString(notes[getPositiveModulo(relativeIndex, notes.length)])}</span
@@ -182,6 +183,7 @@
 	h1 {
 		font-family: var(--font-family-handwritten);
 		text-align: center;
+		line-height: 2em;
 	}
 
 	.noteLabel {
@@ -208,6 +210,14 @@
 		transition: background-color 0.5s;
 		border-radius: 3px;
 		background-color: var(--button-background-color);
+	}
+
+	button:hover:not(.selectedTab) {
+		background-color: var(--button-hover-background-color);
+	}
+
+	button.selectedTab {
+		background-color: var(--button-selected-background-color);
 	}
 
 	.appContainer {
@@ -247,6 +257,10 @@
 	}
 
 	.transitionAll {
+		-webkit-transition: all 500ms ease;
+		-moz-transition: all 500ms ease;
+		-ms-transition: all 500ms ease;
+		-o-transition: all 500ms ease;
 		transition: all 500ms ease-in-out;
 	}
 
