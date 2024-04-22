@@ -1,4 +1,4 @@
-import type { Note, ScaleNote } from '../types';
+import type { ChordType, Note, ScaleNote } from '../types';
 import { getPositiveModulo, romanize } from '../utils';
 
 export const notes: Note[] = [
@@ -25,8 +25,6 @@ const sumIntervals = (startIndex: number, endIndex: number, intervals: number[])
 	}
 	return sum;
 };
-
-type ChordType = 'major' | 'minor' | 'diminished' | 'bizarre';
 
 const getChordType = (firstInterval: number, secondInterval: number): ChordType => {
 	if (firstInterval === 4 && secondInterval === 7) {
@@ -92,8 +90,6 @@ export const lydianScale = getDiatonicScale(3);
 export const mixolydianScale = getDiatonicScale(4);
 export const aeolianScale = getDiatonicScale(5);
 export const locrianScale = getDiatonicScale(6);
-console.log(locrianScale);
-console.log(aeolianScale);
 
 export const diatonicScales = [
 	{

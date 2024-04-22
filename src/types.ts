@@ -8,3 +8,5 @@ export interface ScaleNote {
 	semitonesFromRoot: number;
 	label: string;
 };
+
+export type ChordType = 'major' | 'minor' | 'diminished' | 'bizarre';

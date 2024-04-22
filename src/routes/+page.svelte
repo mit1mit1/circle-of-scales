@@ -56,11 +56,11 @@
 	};
 </script>
 
+<h1>
+	{getNoteString(notes[getPositiveModulo(rootNoteIndex, notes.length)])}
+	{selectedScale.name}
+</h1>
 <div class="appContainer" data-sveltekit-preload-data="hover">
-	<h1>
-		{getNoteString(notes[getPositiveModulo(rootNoteIndex, notes.length)])}
-		{selectedScale.name}
-	</h1>
 	<svg id="boxOfNotes" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
 		<circle
 			cx={circleCentre.x}
@@ -132,7 +132,6 @@
 	</svg>
 
 	<div>
-		{getNoteString(notes[getPositiveModulo(rootNoteIndex, notes.length)])}
 		<button
 			on:click={() => {
 				rootNoteIndex = rootNoteIndex - 1;
@@ -143,6 +142,9 @@
 		>
 			-
 		</button>
+		<span class="noteLabel">
+			{getNoteString(notes[getPositiveModulo(rootNoteIndex, notes.length)])}
+		</span>
 		<button
 			on:click={() => {
 				rootNoteIndex = rootNoteIndex + 1;
@@ -164,7 +166,9 @@
 					rootNoteIndex = getPositiveModulo(relativeIndex, notes.length);
 				}}
 			>
-				{getNoteString(notes[getPositiveModulo(relativeIndex, notes.length)])}
+				<span class="noteLabel"
+					>{getNoteString(notes[getPositiveModulo(relativeIndex, notes.length)])}</span
+				>
 				{diatonicScale.name}
 			</button>
 		{/each}
@@ -172,6 +176,40 @@
 </div>
 
 <style>
+	@import '../themes/light.css';
+	@import '../themes/global.css';
+
+	h1 {
+		font-family: var(--font-family-handwritten);
+		text-align: center;
+	}
+
+	.noteLabel {
+		min-width: 1.5em;
+		display: inline-block;
+		text-align: center;
+	}
+
+	button {
+		margin-bottom: 5px;
+		margin-right: 5px;
+		transition-duration: 0.4s;
+		border: none;
+		padding: 8px 12px;
+		font-size: 1.15em;
+		font-family: var(--font-family-standard);
+		font-weight: 300;
+		cursor: pointer;
+		color: var(--button-color);
+		min-height: 50px;
+		overflow: hidden;
+		transition: max-height 0.5s ease-out;
+		display: inline-block;
+		transition: background-color 0.5s;
+		border-radius: 3px;
+		background-color: var(--button-background-color);
+	}
+
 	.appContainer {
 		display: block;
 		margin-left: auto;
