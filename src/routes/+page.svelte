@@ -1,6 +1,7 @@
 <script setup lang="ts">
-	import { ionianScale, notes } from '../constants/notes';
+	import { diatonicScales, notes } from '../constants/notes';
 	import type { Note, ScaleNote } from '../types';
+	import { getPositiveModulo } from '../utils';
 	const circleRadius = 330;
 	const circleCentre = {
 		x: 400,
@@ -8,6 +9,8 @@
 	};
 
 	let rootNoteIndex = 0;
+
+	let selectedScale = diatonicScales[0];
 
 	const getNoteString = (note: Note) => {
 		if (note.preferSharp) {
@@ -44,16 +47,20 @@
 		};
 	};
 
-	const isInIonianScale = (noteIndex: number, rootNoteIndex: number) => {
-		let semitonesFromRoot = (noteIndex - rootNoteIndex) % notes.length;
+	const isInScale = (noteIndex: number, rootNoteIndex: number, scale: ScaleNote[]) => {
+		let semitonesFromRoot = getPositiveModulo(noteIndex - rootNoteIndex, notes.length);
 		if (semitonesFromRoot < 0) {
 			semitonesFromRoot = semitonesFromRoot + notes.length;
 		}
-		return ionianScale.some((scaleNote) => scaleNote.semitonesFromRoot === semitonesFromRoot);
+		return scale.some((scaleNote) => scaleNote.semitonesFromRoot === semitonesFromRoot);
 	};
 </script>
 
 <div class="appContainer" data-sveltekit-preload-data="hover">
+	<h1>
+		{getNoteString(notes[getPositiveModulo(rootNoteIndex, notes.length)])}
+		{selectedScale.name}
+	</h1>
 	<svg id="boxOfNotes" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
 		<circle
 			cx={circleCentre.x}
@@ -64,7 +71,7 @@
 			fill="transparent"
 		/>
 		{#each [...notes] as note, index}
-			<g class="transitionNote">
+			<g class="transitionAll">
 				<circle
 					style="stroke-width:1.6871;stroke-miterlimit:10;"
 					cx={getNotePosition(index).x}
@@ -72,69 +79,96 @@
 					r={30}
 					stroke="black"
 					fill="transparent"
-					class={isInIonianScale(index, rootNoteIndex)
-						? 'transitionNote visible'
-						: 'transitionNote hidden'}
+					class="hidden transitionAll"
 				/>
 				<text
 					x={getNotePosition(index).x}
 					y={getNotePosition(index).y}
-					class={`svgNoteName ${
-						isInIonianScale(index, rootNoteIndex) ? 'svgSelectedNoteName' : ''
+					class={`svgNoteName transitionAll ${
+						isInScale(index, rootNoteIndex, selectedScale.scale) ? 'svgSelectedNoteName' : ''
 					}`}
 					text-anchor="middle"
 					dy=".3em">{getNoteString(note)}</text
 				>
 			</g>
 		{/each}
-		{#each [...ionianScale] as scaleNote}
+		{#each [...selectedScale.scale] as scaleNote}
 			<g class="transitionNote">
 				<circle
 					style="stroke-width:1.6871;stroke-miterlimit:10;"
-					cx={getScaleNotePosition(scaleNote, 0).x}
-					cy={getScaleNotePosition(scaleNote, 0).y}
+					cx={0}
+					cy={0}
 					r={30}
-					transform={`rotate(${(rootNoteIndex * 360) / notes.length} ${circleCentre.x} ${
-						circleCentre.y
+					transform={`translate(${getNotePosition(scaleNote.semitonesFromRoot + rootNoteIndex).x} ${
+						getNotePosition(scaleNote.semitonesFromRoot + rootNoteIndex).y
+					})`}
+					stroke="black"
+					fill="transparent"
+					class="transitionAll"
+				/>
+				<circle
+					style="stroke-width:1.6871;stroke-miterlimit:10;"
+					cx={0}
+					cy={0}
+					r={30}
+					transform={`translate(${getScaleNotePosition(scaleNote, rootNoteIndex).x} ${
+						getScaleNotePosition(scaleNote, rootNoteIndex).y
 					})`}
 					class="hidden"
 					fill="transparent"
 				/>
 				<text
-					x={getScaleNotePosition(scaleNote, 0).x}
-					y={getScaleNotePosition(scaleNote, 0).y}
+					x={0}
+					y={0}
 					text-anchor="middle"
 					dy=".3em"
-					transform={`rotate(${(rootNoteIndex * 360) / notes.length} ${circleCentre.x} ${
-						circleCentre.y
+					transform={`translate(${getScaleNotePosition(scaleNote, rootNoteIndex).x} ${
+						getScaleNotePosition(scaleNote, rootNoteIndex).y
 					})`}
-					class="svgNoteName scaleNote">{scaleNote.label}</text
+					class="svgNoteName scaleNote transitionAll">{scaleNote.label}</text
 				>
 			</g>
 		{/each}
 	</svg>
 
-	{getNoteString(notes[rootNoteIndex])}
-	<button
-		on:click={() => {
-			rootNoteIndex = rootNoteIndex - 1;
-			if (rootNoteIndex < 0) {
-				rootNoteIndex = rootNoteIndex + 12;
-			}
-		}}
-	>
-		-
-	</button>
-	<button
-		on:click={() => {
-			rootNoteIndex = rootNoteIndex + 1;
-			if (rootNoteIndex >= 12) {
-				rootNoteIndex = rootNoteIndex - 12;
-			}
-		}}
-	>
-		+
-	</button>
+	<div>
+		{getNoteString(notes[getPositiveModulo(rootNoteIndex, notes.length)])}
+		<button
+			on:click={() => {
+				rootNoteIndex = rootNoteIndex - 1;
+				if (rootNoteIndex < 0) {
+					rootNoteIndex = rootNoteIndex + 12;
+				}
+			}}
+		>
+			-
+		</button>
+		<button
+			on:click={() => {
+				rootNoteIndex = rootNoteIndex + 1;
+				if (rootNoteIndex >= 12) {
+					rootNoteIndex = rootNoteIndex - 12;
+				}
+			}}
+		>
+			+
+		</button>
+	</div>
+	<div>
+		{#each diatonicScales as diatonicScale}
+			{@const relativeIndex =
+				rootNoteIndex + diatonicScale.rootIntervalToIonian - selectedScale.rootIntervalToIonian}
+			<button
+				on:click={() => {
+					selectedScale = diatonicScale;
+					rootNoteIndex = getPositiveModulo(relativeIndex, notes.length);
+				}}
+			>
+				{getNoteString(notes[getPositiveModulo(relativeIndex, notes.length)])}
+				{diatonicScale.name}
+			</button>
+		{/each}
+	</div>
 </div>
 
 <style>
@@ -168,19 +202,17 @@
 
 	.scaleNote {
 		font-weight: bold;
-		transition: all 700ms ease-in-out;
 	}
 
 	.hidden {
 		opacity: 0;
 	}
 
-	.transitionNote {
-		opacity: 1;
-		transition: opacity 0.25s linear;
+	.transitionAll {
+		transition: all 500ms ease-in-out;
 	}
 
-	.transitionNote.hidden {
+	.transitionAll.hidden {
 		opacity: 0;
 	}
 </style>
