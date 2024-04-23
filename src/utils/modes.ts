@@ -181,3 +181,14 @@ export const majorPentatonicModes = [
 		rootIntervalToIonian: sumIntervals(0, 4, pentatonicMajorIntervals)
 	}
 ];
+
+export const modeGroups = [
+	{
+		label: 'Diatonic',
+		modes: diatonicModes
+	},
+	{
+		label: '(Major) Pentatonic',
+		modes: majorPentatonicModes
+	}
+];

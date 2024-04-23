@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import { diatonicModes, majorPentatonicModes, getIntervalLabel } from '../utils/modes';
+	import { modeGroups, getIntervalLabel } from '../utils/modes';
 	import type { Circle, Note, ScaleNote } from '../types';
 	import { getPositiveModulo } from '../utils/math';
 	import { westernChromaticScale } from '../utils/constants';
@@ -28,8 +28,8 @@
 
 	let rootNoteIndex = 0;
 
-	let selectedScale = diatonicModes[0];
-	let selectedModesGroup = diatonicModes;
+	let selectedModesGroup = modeGroups[0];
+	let selectedScale = selectedModesGroup.modes[0];
 
 	const getNoteString = (note: Note) => {
 		if (note.preferSharp) {
@@ -119,7 +119,7 @@
 				? getNotePosition(
 						selectedScale.scale[
 							getPositiveModulo(
-								index - selectedModesGroup.findIndex((scale) => scale === selectedScale),
+								index - selectedModesGroup.modes.findIndex((scale) => scale === selectedScale),
 								selectedScale.scale.length
 							)
 						].semitonesFromRoot + rootNoteIndex,
@@ -166,7 +166,7 @@
 			</g>
 		{/each}
 	</svg>
-	<div>
+	<div id="boxOfButtons">
 		<div>
 			Root note
 			<button
@@ -196,79 +196,35 @@
 			</button>
 		</div>
 		<div>
-			<div>
-				<div>
-					<h2>Equivalent diatonic modes</h2>
-					{#each diatonicModes as diatonicScale}
-						{@const relativeIndex =
-							rootNoteIndex +
-							diatonicScale.rootIntervalToIonian -
-							selectedScale.rootIntervalToIonian}
-						<button
-							on:click={() => {
-								selectedScale = diatonicScale;
-								selectedModesGroup = diatonicModes;
-								rootNoteIndex = getPositiveModulo(relativeIndex, westernChromaticScale.length);
-								isEquivilantModing = true;
-							}}
-							class={diatonicScale === selectedScale && isEquivilantModing ? 'selectedTab' : ''}
-						>
-							<span class="noteLabel"
-								>{getNoteString(
-									westernChromaticScale[
-										getPositiveModulo(relativeIndex, westernChromaticScale.length)
-									]
-								)}</span
-							>
-							{diatonicScale.name}
-						</button>
-					{/each}
-				</div>
-			</div>
-			<div>
-				<div>
-					<h2>Diatonic modes by modification</h2>
-					{#each diatonicModes as diatonicScale}
-						{@const relativeIndex = rootNoteIndex}
-						<button
-							on:click={() => {
-								selectedScale = diatonicScale;
-								selectedModesGroup = diatonicModes;
-								rootNoteIndex = getPositiveModulo(relativeIndex, westernChromaticScale.length);
-								isEquivilantModing = false;
-							}}
-							class={diatonicScale === selectedScale && !isEquivilantModing ? 'selectedTab' : ''}
-						>
-							<span class="noteLabel"
-								>{getNoteString(
-									westernChromaticScale[
-										getPositiveModulo(relativeIndex, westernChromaticScale.length)
-									]
-								)}</span
-							>
-							{diatonicScale.name}
-						</button>
-					{/each}
-				</div>
-			</div>
+			Mode type
+			{#each modeGroups as modeGroup}
+				<button
+					on:click={() => {
+						if (selectedModesGroup !== modeGroup) {
+							selectedModesGroup = modeGroup;
+							selectedScale = modeGroup.modes[0];
+						}
+					}}
+					class={selectedModesGroup === modeGroup ? 'selectedTab' : ''}
+				>
+					{modeGroup.label}
+				</button>
+			{/each}
 		</div>
 		<div>
 			<div>
 				<div>
-					<h2>Equivalent (major) pentatonic modes</h2>
-					{#each majorPentatonicModes as pentatonicScale}
+					<h2>Equivalent {selectedModesGroup.label} modes</h2>
+					{#each selectedModesGroup.modes as scale}
 						{@const relativeIndex =
-							rootNoteIndex +
-							pentatonicScale.rootIntervalToIonian -
-							selectedScale.rootIntervalToIonian}
+							rootNoteIndex + scale.rootIntervalToIonian - selectedScale.rootIntervalToIonian}
 						<button
 							on:click={() => {
-								selectedScale = pentatonicScale;
-								selectedModesGroup = majorPentatonicModes;
+								selectedScale = scale;
 								rootNoteIndex = getPositiveModulo(relativeIndex, westernChromaticScale.length);
 								isEquivilantModing = true;
 							}}
-							class={pentatonicScale === selectedScale && isEquivilantModing ? 'selectedTab' : ''}
+							class={scale === selectedScale && isEquivilantModing ? 'selectedTab' : ''}
 						>
 							<span class="noteLabel"
 								>{getNoteString(
@@ -277,24 +233,23 @@
 									]
 								)}</span
 							>
-							{pentatonicScale.name}
+							{scale.name}
 						</button>
 					{/each}
 				</div>
 			</div>
 			<div>
 				<div>
-					<h2>Pentatonic (major) modes by modification</h2>
-					{#each majorPentatonicModes as pentatonicScale}
+					<h2>Modes by modification</h2>
+					{#each selectedModesGroup.modes as scale}
 						{@const relativeIndex = rootNoteIndex}
 						<button
 							on:click={() => {
-								selectedScale = pentatonicScale;
-								selectedModesGroup = majorPentatonicModes;
+								selectedScale = scale;
 								rootNoteIndex = getPositiveModulo(relativeIndex, westernChromaticScale.length);
 								isEquivilantModing = false;
 							}}
-							class={pentatonicScale === selectedScale && !isEquivilantModing ? 'selectedTab' : ''}
+							class={scale === selectedScale && !isEquivilantModing ? 'selectedTab' : ''}
 						>
 							<span class="noteLabel"
 								>{getNoteString(
@@ -303,7 +258,7 @@
 									]
 								)}</span
 							>
-							{pentatonicScale.name}
+							{scale.name}
 						</button>
 					{/each}
 				</div>
@@ -365,15 +320,19 @@
 		display: flex;
 		margin-left: auto;
 		margin-right: auto;
-		max-width: 800px;
+		max-width: 1000px;
+		flex-wrap: wrap;
+		padding-inline: 20px;
+		justify-content: space-evenly
 	}
 
 	.appContainer svg {
 		width: 400px;
 		height: 400px;
 	}
-	#boxOfNotes {
-		width: 100%;
+
+	#boxOfButtons {
+		max-width: 500px;
 	}
 
 	.svgNoteName {
