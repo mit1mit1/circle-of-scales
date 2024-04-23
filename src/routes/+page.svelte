@@ -1,14 +1,14 @@
 <script setup lang="ts">
-	import { diatonicScales, getIntervalLabel, notes } from '../constants/notes';
+	import { diatonicModes, majorPentatonicModes, getIntervalLabel } from '../utils/modes';
 	import type { Circle, Note, ScaleNote } from '../types';
-	import { getPositiveModulo } from '../utils';
+	import { getPositiveModulo } from '../utils/math';
+	import { westernChromaticScale } from '../utils/constants';
 	const visibleCircle: Circle = {
 		xCentre: 400,
 		yCentre: 400,
 		radius: 360
 	};
 
-	const scaleType = 'diatonic';
 	let isEquivilantModing = true;
 
 	const notePositionCircle: Circle = {
@@ -28,7 +28,8 @@
 
 	let rootNoteIndex = 0;
 
-	let selectedScale = diatonicScales[0];
+	let selectedScale = diatonicModes[0];
+	let selectedModesGroup = diatonicModes;
 
 	const getNoteString = (note: Note) => {
 		if (note.preferSharp) {
@@ -41,10 +42,12 @@
 		return {
 			x:
 				circle.xCentre +
-				circle.radius * Math.cos((noteIndex * 2 * Math.PI) / notes.length - 0.5 * Math.PI),
+				circle.radius *
+					Math.cos((noteIndex * 2 * Math.PI) / westernChromaticScale.length - 0.5 * Math.PI),
 			y:
 				circle.yCentre +
-				circle.radius * Math.sin((noteIndex * 2 * Math.PI) / notes.length - 0.5 * Math.PI)
+				circle.radius *
+					Math.sin((noteIndex * 2 * Math.PI) / westernChromaticScale.length - 0.5 * Math.PI)
 		};
 	};
 
@@ -54,28 +57,37 @@
 				circle.xCentre +
 				circle.radius *
 					Math.cos(
-						((scaleNote.semitonesFromRoot + rootIndex) * 2 * Math.PI) / notes.length - 0.5 * Math.PI
+						((scaleNote.semitonesFromRoot + rootIndex) * 2 * Math.PI) /
+							westernChromaticScale.length -
+							0.5 * Math.PI
 					),
 			y:
 				circle.yCentre +
 				circle.radius *
 					Math.sin(
-						((scaleNote.semitonesFromRoot + rootIndex) * 2 * Math.PI) / notes.length - 0.5 * Math.PI
+						((scaleNote.semitonesFromRoot + rootIndex) * 2 * Math.PI) /
+							westernChromaticScale.length -
+							0.5 * Math.PI
 					)
 		};
 	};
 
 	const isInScale = (noteIndex: number, rootNoteIndex: number, scale: ScaleNote[]) => {
-		let semitonesFromRoot = getPositiveModulo(noteIndex - rootNoteIndex, notes.length);
+		let semitonesFromRoot = getPositiveModulo(
+			noteIndex - rootNoteIndex,
+			westernChromaticScale.length
+		);
 		if (semitonesFromRoot < 0) {
-			semitonesFromRoot = semitonesFromRoot + notes.length;
+			semitonesFromRoot = semitonesFromRoot + westernChromaticScale.length;
 		}
 		return scale.some((scaleNote) => scaleNote.semitonesFromRoot === semitonesFromRoot);
 	};
 </script>
 
 <h1>
-	{getNoteString(notes[getPositiveModulo(rootNoteIndex, notes.length)])}
+	{getNoteString(
+		westernChromaticScale[getPositiveModulo(rootNoteIndex, westernChromaticScale.length)]
+	)}
 	{selectedScale.name}
 </h1>
 <div class="appContainer" data-sveltekit-preload-data="hover">
@@ -88,7 +100,7 @@
 			stroke-width={1}
 			fill="transparent"
 		/>
-		{#each [...notes] as note, index}
+		{#each [...westernChromaticScale] as note, index}
 			{@const notePosition = getNotePosition(index, notePositionCircle)}
 			<g class="transitionAll">
 				<text
@@ -103,18 +115,17 @@
 			</g>
 		{/each}
 		{#each [...selectedScale.scale] as scaleNote, index}
-			{@const notePosition =
-				scaleType === 'diatonic' && isEquivilantModing
-					? getNotePosition(
-							selectedScale.scale[
-								getPositiveModulo(
-									index - diatonicScales.findIndex((scale) => scale === selectedScale),
-									selectedScale.scale.length
-								)
-							].semitonesFromRoot + rootNoteIndex,
-							notePositionCircle
-					  )
-					: getNotePosition(scaleNote.semitonesFromRoot + rootNoteIndex, notePositionCircle)}
+			{@const notePosition = isEquivilantModing
+				? getNotePosition(
+						selectedScale.scale[
+							getPositiveModulo(
+								index - selectedModesGroup.findIndex((scale) => scale === selectedScale),
+								selectedScale.scale.length
+							)
+						].semitonesFromRoot + rootNoteIndex,
+						notePositionCircle
+				  )
+				: getNotePosition(scaleNote.semitonesFromRoot + rootNoteIndex, notePositionCircle)}
 			{@const scaleNotePosition = getScaleNotePosition(
 				scaleNote,
 				rootNoteIndex,
@@ -169,7 +180,9 @@
 				-
 			</button>
 			<span class="noteLabel">
-				{getNoteString(notes[getPositiveModulo(rootNoteIndex, notes.length)])}
+				{getNoteString(
+					westernChromaticScale[getPositiveModulo(rootNoteIndex, westernChromaticScale.length)]
+				)}
 			</span>
 			<button
 				on:click={() => {
@@ -184,45 +197,116 @@
 		</div>
 		<div>
 			<div>
-				<h2>Equivalent modes</h2>
-				{#each diatonicScales as diatonicScale}
-					{@const relativeIndex =
-						rootNoteIndex + diatonicScale.rootIntervalToIonian - selectedScale.rootIntervalToIonian}
-					<button
-						on:click={() => {
-							selectedScale = diatonicScale;
-							rootNoteIndex = getPositiveModulo(relativeIndex, notes.length);
-							isEquivilantModing = true;
-						}}
-						class={diatonicScale === selectedScale && isEquivilantModing ? 'selectedTab' : ''}
-					>
-						<span class="noteLabel"
-							>{getNoteString(notes[getPositiveModulo(relativeIndex, notes.length)])}</span
+				<div>
+					<h2>Equivalent diatonic modes</h2>
+					{#each diatonicModes as diatonicScale}
+						{@const relativeIndex =
+							rootNoteIndex +
+							diatonicScale.rootIntervalToIonian -
+							selectedScale.rootIntervalToIonian}
+						<button
+							on:click={() => {
+								selectedScale = diatonicScale;
+								selectedModesGroup = diatonicModes;
+								rootNoteIndex = getPositiveModulo(relativeIndex, westernChromaticScale.length);
+								isEquivilantModing = true;
+							}}
+							class={diatonicScale === selectedScale && isEquivilantModing ? 'selectedTab' : ''}
 						>
-						{diatonicScale.name}
-					</button>
-				{/each}
+							<span class="noteLabel"
+								>{getNoteString(
+									westernChromaticScale[
+										getPositiveModulo(relativeIndex, westernChromaticScale.length)
+									]
+								)}</span
+							>
+							{diatonicScale.name}
+						</button>
+					{/each}
+				</div>
+			</div>
+			<div>
+				<div>
+					<h2>Diatonic modes by modification</h2>
+					{#each diatonicModes as diatonicScale}
+						{@const relativeIndex = rootNoteIndex}
+						<button
+							on:click={() => {
+								selectedScale = diatonicScale;
+								selectedModesGroup = diatonicModes;
+								rootNoteIndex = getPositiveModulo(relativeIndex, westernChromaticScale.length);
+								isEquivilantModing = false;
+							}}
+							class={diatonicScale === selectedScale && !isEquivilantModing ? 'selectedTab' : ''}
+						>
+							<span class="noteLabel"
+								>{getNoteString(
+									westernChromaticScale[
+										getPositiveModulo(relativeIndex, westernChromaticScale.length)
+									]
+								)}</span
+							>
+							{diatonicScale.name}
+						</button>
+					{/each}
+				</div>
 			</div>
 		</div>
 		<div>
 			<div>
-				<h2>Modes by modification</h2>
-				{#each diatonicScales as diatonicScale}
-					{@const relativeIndex = rootNoteIndex}
-					<button
-						on:click={() => {
-							selectedScale = diatonicScale;
-							rootNoteIndex = getPositiveModulo(relativeIndex, notes.length);
-							isEquivilantModing = false;
-						}}
-						class={diatonicScale === selectedScale && !isEquivilantModing ? 'selectedTab' : ''}
-					>
-						<span class="noteLabel"
-							>{getNoteString(notes[getPositiveModulo(relativeIndex, notes.length)])}</span
+				<div>
+					<h2>Equivalent (major) pentatonic modes</h2>
+					{#each majorPentatonicModes as pentatonicScale}
+						{@const relativeIndex =
+							rootNoteIndex +
+							pentatonicScale.rootIntervalToIonian -
+							selectedScale.rootIntervalToIonian}
+						<button
+							on:click={() => {
+								selectedScale = pentatonicScale;
+								selectedModesGroup = majorPentatonicModes;
+								rootNoteIndex = getPositiveModulo(relativeIndex, westernChromaticScale.length);
+								isEquivilantModing = true;
+							}}
+							class={pentatonicScale === selectedScale && isEquivilantModing ? 'selectedTab' : ''}
 						>
-						{diatonicScale.name}
-					</button>
-				{/each}
+							<span class="noteLabel"
+								>{getNoteString(
+									westernChromaticScale[
+										getPositiveModulo(relativeIndex, westernChromaticScale.length)
+									]
+								)}</span
+							>
+							{pentatonicScale.name}
+						</button>
+					{/each}
+				</div>
+			</div>
+			<div>
+				<div>
+					<h2>Pentatonic (major) modes by modification</h2>
+					{#each majorPentatonicModes as pentatonicScale}
+						{@const relativeIndex = rootNoteIndex}
+						<button
+							on:click={() => {
+								selectedScale = pentatonicScale;
+								selectedModesGroup = majorPentatonicModes;
+								rootNoteIndex = getPositiveModulo(relativeIndex, westernChromaticScale.length);
+								isEquivilantModing = false;
+							}}
+							class={pentatonicScale === selectedScale && !isEquivilantModing ? 'selectedTab' : ''}
+						>
+							<span class="noteLabel"
+								>{getNoteString(
+									westernChromaticScale[
+										getPositiveModulo(relativeIndex, westernChromaticScale.length)
+									]
+								)}</span
+							>
+							{pentatonicScale.name}
+						</button>
+					{/each}
+				</div>
 			</div>
 		</div>
 	</div>
