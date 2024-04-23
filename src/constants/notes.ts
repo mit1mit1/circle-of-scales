@@ -128,3 +128,37 @@ export const diatonicScales = [
 		rootIntervalToIonian: sumIntervals(0, 6, diatonicIntervals)
 	}
 ];
+
+export const getIntervalLabel = (scaleNote: ScaleNote, index: number) => {
+	const intervalLabel = index + 1;
+
+	const diff = scaleNote.semitonesFromRoot - sumIntervals(0, index, diatonicIntervals);
+	if (diff === 1) {
+		// Augmented
+		return `A${intervalLabel}`;
+	}
+
+	const perfectIntervals = [1, 4, 5];
+	if (perfectIntervals.includes(intervalLabel)) {
+		if (diff === 0) {
+			// Perfect
+			return `P${intervalLabel}`;
+		}
+		if (diff === -1) {
+			// Diminished
+			return `d${intervalLabel}`;
+		}
+	}
+	if (diff === 0) {
+		// Major
+		return `M${intervalLabel}`;
+	}
+	if (diff === -1) {
+		// Minor
+		return `m${intervalLabel}`;
+	}
+	if (diff === -2) {
+		// Diminished
+		return `d${intervalLabel}`;
+	}
+};

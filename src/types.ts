@@ -10,3 +10,9 @@ export interface ScaleNote {
 };
 
 export type ChordType = 'major' | 'minor' | 'diminished' | 'bizarre';
+
+export type Circle = {
+	xCentre: number,
+	yCentre: number,
+	radius: number,
+}

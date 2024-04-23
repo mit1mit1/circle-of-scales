@@ -1,11 +1,29 @@
 <script setup lang="ts">
-	import { diatonicScales, notes } from '../constants/notes';
-	import type { Note, ScaleNote } from '../types';
+	import { diatonicScales, getIntervalLabel, notes } from '../constants/notes';
+	import type { Circle, Note, ScaleNote } from '../types';
 	import { getPositiveModulo } from '../utils';
-	const circleRadius = 330;
-	const circleCentre = {
-		x: 400,
-		y: 400
+	const visibleCircle: Circle = {
+		xCentre: 400,
+		yCentre: 400,
+		radius: 360
+	};
+
+	const scaleType = 'diatonic';
+	let isEquivilantModing = true;
+
+	const notePositionCircle: Circle = {
+		...visibleCircle,
+		radius: visibleCircle.radius - 40
+	};
+
+	const scaleNotePositionCircle: Circle = {
+		...visibleCircle,
+		radius: visibleCircle.radius - 110
+	};
+
+	const intervalPositionCircle: Circle = {
+		...visibleCircle,
+		radius: visibleCircle.radius - 160
 	};
 
 	let rootNoteIndex = 0;
@@ -19,28 +37,28 @@
 		return note.flatNote;
 	};
 
-	const getNotePosition = (noteIndex: number) => {
+	const getNotePosition = (noteIndex: number, circle: Circle) => {
 		return {
 			x:
-				circleCentre.x +
-				(circleRadius - 10) * Math.cos((noteIndex * 2 * Math.PI) / notes.length - 0.5 * Math.PI),
+				circle.xCentre +
+				circle.radius * Math.cos((noteIndex * 2 * Math.PI) / notes.length - 0.5 * Math.PI),
 			y:
-				circleCentre.y +
-				(circleRadius - 10) * Math.sin((noteIndex * 2 * Math.PI) / notes.length - 0.5 * Math.PI)
+				circle.yCentre +
+				circle.radius * Math.sin((noteIndex * 2 * Math.PI) / notes.length - 0.5 * Math.PI)
 		};
 	};
 
-	const getScaleNotePosition = (scaleNote: ScaleNote, rootIndex: number) => {
+	const getScaleNotePosition = (scaleNote: ScaleNote, rootIndex: number, circle: Circle) => {
 		return {
 			x:
-				circleCentre.x +
-				(circleRadius - 80) *
+				circle.xCentre +
+				circle.radius *
 					Math.cos(
 						((scaleNote.semitonesFromRoot + rootIndex) * 2 * Math.PI) / notes.length - 0.5 * Math.PI
 					),
 			y:
-				circleCentre.y +
-				(circleRadius - 80) *
+				circle.yCentre +
+				circle.radius *
 					Math.sin(
 						((scaleNote.semitonesFromRoot + rootIndex) * 2 * Math.PI) / notes.length - 0.5 * Math.PI
 					)
@@ -63,27 +81,19 @@
 <div class="appContainer" data-sveltekit-preload-data="hover">
 	<svg id="boxOfNotes" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
 		<circle
-			cx={circleCentre.x}
-			cy={circleCentre.y}
-			r={circleRadius + 30}
+			cx={visibleCircle.xCentre}
+			cy={visibleCircle.yCentre}
+			r={visibleCircle.radius}
 			stroke="grey"
 			stroke-width={1}
 			fill="transparent"
 		/>
 		{#each [...notes] as note, index}
+			{@const notePosition = getNotePosition(index, notePositionCircle)}
 			<g class="transitionAll">
-				<circle
-					style="stroke-width:1.6871;stroke-miterlimit:10;"
-					cx={getNotePosition(index).x}
-					cy={getNotePosition(index).y}
-					r={30}
-					stroke="black"
-					fill="transparent"
-					class="hidden transitionAll"
-				/>
 				<text
-					x={getNotePosition(index).x}
-					y={getNotePosition(index).y}
+					x={notePosition.x}
+					y={notePosition.y}
 					class={`svgNoteName transitionAll ${
 						isInScale(index, rootNoteIndex, selectedScale.scale) ? 'svgSelectedNoteName' : ''
 					}`}
@@ -92,87 +102,129 @@
 				>
 			</g>
 		{/each}
-		{#each [...selectedScale.scale] as scaleNote}
+		{#each [...selectedScale.scale] as scaleNote, index}
+			{@const notePosition =
+				scaleType === 'diatonic' && isEquivilantModing
+					? getNotePosition(
+							selectedScale.scale[
+								getPositiveModulo(
+									index - diatonicScales.findIndex((scale) => scale === selectedScale),
+									selectedScale.scale.length
+								)
+							].semitonesFromRoot + rootNoteIndex,
+							notePositionCircle
+					  )
+					: getNotePosition(scaleNote.semitonesFromRoot + rootNoteIndex, notePositionCircle)}
+			{@const scaleNotePosition = getScaleNotePosition(
+				scaleNote,
+				rootNoteIndex,
+				scaleNotePositionCircle
+			)}
+			{@const intervalPosition = getScaleNotePosition(
+				scaleNote,
+				rootNoteIndex,
+				intervalPositionCircle
+			)}
+			<circle
+				style="stroke-width:1.6871;stroke-miterlimit:10;"
+				cx={0}
+				cy={0}
+				r={30}
+				transform={`translate(${notePosition.x} ${notePosition.y})`}
+				stroke="black"
+				fill="transparent"
+				class="transitionAll"
+			/>
 			<g class="transitionNote">
-				<circle
-					style="stroke-width:1.6871;stroke-miterlimit:10;"
-					cx={0}
-					cy={0}
-					r={30}
-					transform={`translate(${getNotePosition(scaleNote.semitonesFromRoot + rootNoteIndex).x} ${
-						getNotePosition(scaleNote.semitonesFromRoot + rootNoteIndex).y
-					})`}
-					stroke="black"
-					fill="transparent"
-					class="transitionAll"
-				/>
-				<circle
-					style="stroke-width:1.6871;stroke-miterlimit:10;"
-					cx={0}
-					cy={0}
-					r={30}
-					transform={`translate(${getScaleNotePosition(scaleNote, rootNoteIndex).x} ${
-						getScaleNotePosition(scaleNote, rootNoteIndex).y
-					})`}
-					class="hidden"
-					fill="transparent"
-				/>
 				<text
 					x={0}
 					y={0}
 					text-anchor="middle"
 					dy=".3em"
-					transform={`translate(${getScaleNotePosition(scaleNote, rootNoteIndex).x} ${
-						getScaleNotePosition(scaleNote, rootNoteIndex).y
-					})`}
+					transform={`translate(${scaleNotePosition.x} ${scaleNotePosition.y})`}
 					class="svgNoteName scaleNote transitionAll">{scaleNote.label}</text
+				>
+				<text
+					x={0}
+					y={0}
+					text-anchor="middle"
+					dy=".3em"
+					transform={`translate(${intervalPosition.x} ${intervalPosition.y})`}
+					class="svgNoteName scaleNote transitionAll">{getIntervalLabel(scaleNote, index)}</text
 				>
 			</g>
 		{/each}
 	</svg>
-
 	<div>
-		<button
-			on:click={() => {
-				rootNoteIndex = rootNoteIndex - 1;
-				if (rootNoteIndex < 0) {
-					rootNoteIndex = rootNoteIndex + 12;
-				}
-			}}
-		>
-			-
-		</button>
-		<span class="noteLabel">
-			{getNoteString(notes[getPositiveModulo(rootNoteIndex, notes.length)])}
-		</span>
-		<button
-			on:click={() => {
-				rootNoteIndex = rootNoteIndex + 1;
-				if (rootNoteIndex >= 12) {
-					rootNoteIndex = rootNoteIndex - 12;
-				}
-			}}
-		>
-			+
-		</button>
-	</div>
-	<div>
-		{#each diatonicScales as diatonicScale}
-			{@const relativeIndex =
-				rootNoteIndex + diatonicScale.rootIntervalToIonian - selectedScale.rootIntervalToIonian}
+		<div>
+			Root note
 			<button
 				on:click={() => {
-					selectedScale = diatonicScale;
-					rootNoteIndex = getPositiveModulo(relativeIndex, notes.length);
+					rootNoteIndex = rootNoteIndex - 1;
+					if (rootNoteIndex < 0) {
+						rootNoteIndex = rootNoteIndex + 12;
+					}
 				}}
-				class={diatonicScale === selectedScale ? 'selectedTab' : ''}
 			>
-				<span class="noteLabel"
-					>{getNoteString(notes[getPositiveModulo(relativeIndex, notes.length)])}</span
-				>
-				{diatonicScale.name}
+				-
 			</button>
-		{/each}
+			<span class="noteLabel">
+				{getNoteString(notes[getPositiveModulo(rootNoteIndex, notes.length)])}
+			</span>
+			<button
+				on:click={() => {
+					rootNoteIndex = rootNoteIndex + 1;
+					if (rootNoteIndex >= 12) {
+						rootNoteIndex = rootNoteIndex - 12;
+					}
+				}}
+			>
+				+
+			</button>
+		</div>
+		<div>
+			<div>
+				<h2>Equivalent modes</h2>
+				{#each diatonicScales as diatonicScale}
+					{@const relativeIndex =
+						rootNoteIndex + diatonicScale.rootIntervalToIonian - selectedScale.rootIntervalToIonian}
+					<button
+						on:click={() => {
+							selectedScale = diatonicScale;
+							rootNoteIndex = getPositiveModulo(relativeIndex, notes.length);
+							isEquivilantModing = true;
+						}}
+						class={diatonicScale === selectedScale && isEquivilantModing ? 'selectedTab' : ''}
+					>
+						<span class="noteLabel"
+							>{getNoteString(notes[getPositiveModulo(relativeIndex, notes.length)])}</span
+						>
+						{diatonicScale.name}
+					</button>
+				{/each}
+			</div>
+		</div>
+		<div>
+			<div>
+				<h2>Modes by modification</h2>
+				{#each diatonicScales as diatonicScale}
+					{@const relativeIndex = rootNoteIndex}
+					<button
+						on:click={() => {
+							selectedScale = diatonicScale;
+							rootNoteIndex = getPositiveModulo(relativeIndex, notes.length);
+							isEquivilantModing = false;
+						}}
+						class={diatonicScale === selectedScale && !isEquivilantModing ? 'selectedTab' : ''}
+					>
+						<span class="noteLabel"
+							>{getNoteString(notes[getPositiveModulo(relativeIndex, notes.length)])}</span
+						>
+						{diatonicScale.name}
+					</button>
+				{/each}
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -181,13 +233,18 @@
 	@import '../themes/global.css';
 
 	h1 {
-		font-family: var(--font-family-handwritten);
+		font-family: var(--font-family-standard);
 		text-align: center;
 		line-height: 2em;
 	}
 
+	h2 {
+		font-family: var(--font-family-standard);
+		font-size: medium;
+	}
+
 	.noteLabel {
-		min-width: 1.5em;
+		min-width: 22px;
 		display: inline-block;
 		text-align: center;
 	}
@@ -197,13 +254,13 @@
 		margin-right: 5px;
 		transition-duration: 0.4s;
 		border: none;
-		padding: 8px 12px;
+		padding: 8px 8px;
 		font-size: 1.15em;
 		font-family: var(--font-family-standard);
 		font-weight: 300;
 		cursor: pointer;
 		color: var(--button-color);
-		min-height: 50px;
+		min-height: 30px;
 		overflow: hidden;
 		transition: max-height 0.5s ease-out;
 		display: inline-block;
@@ -221,13 +278,16 @@
 	}
 
 	.appContainer {
-		display: block;
+		display: flex;
 		margin-left: auto;
 		margin-right: auto;
+		max-width: 800px;
+	}
+
+	.appContainer svg {
 		width: 400px;
 		height: 400px;
 	}
-
 	#boxOfNotes {
 		width: 100%;
 	}
