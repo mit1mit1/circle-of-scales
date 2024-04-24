@@ -6,24 +6,24 @@
 	const visibleCircle: Circle = {
 		xCentre: 400,
 		yCentre: 400,
-		radius: 360
+		radius: 300
 	};
 
 	let isEquivilantModing = true;
 
 	const notePositionCircle: Circle = {
 		...visibleCircle,
-		radius: visibleCircle.radius - 40
+		radius: visibleCircle.radius
 	};
 
 	const scaleNotePositionCircle: Circle = {
 		...visibleCircle,
-		radius: visibleCircle.radius - 110
+		radius: visibleCircle.radius - 70
 	};
 
 	const intervalPositionCircle: Circle = {
 		...visibleCircle,
-		radius: visibleCircle.radius - 160
+		radius: visibleCircle.radius + 70
 	};
 
 	let rootNoteIndex = 0;
@@ -98,15 +98,25 @@
 			r={visibleCircle.radius}
 			stroke="grey"
 			stroke-width={1}
-			fill="transparent"
+			fill="var(--base-background-color)"
+			class="background"
 		/>
 		{#each [...westernChromaticScale] as note, index}
 			{@const notePosition = getNotePosition(index, notePositionCircle)}
-			<g class="transitionAll">
+			<g>
+				<circle
+					style="stroke-width:1.6871;stroke-miterlimit:10;"
+					cx={0}
+					cy={0}
+					r={30}
+					transform={`translate(${notePosition.x} ${notePosition.y})`}
+					stroke="transparent"
+					fill={index === rootNoteIndex ? "yellow" : "var(--base-background-color)"}
+				/>
 				<text
 					x={notePosition.x}
 					y={notePosition.y}
-					class={`svgNoteName transitionAll ${
+					class={`svgNoteName ${
 						isInScale(index, rootNoteIndex, selectedScale.scale) ? 'svgSelectedNoteName' : ''
 					}`}
 					text-anchor="middle"
@@ -271,6 +281,14 @@
 	@import '../themes/light.css';
 	@import '../themes/global.css';
 
+	.background {
+		z-index: -2;
+	}
+
+	.midground {
+		z-index: -1;
+	}
+
 	h1 {
 		font-family: var(--font-family-standard);
 		text-align: center;
@@ -323,7 +341,7 @@
 		max-width: 1000px;
 		flex-wrap: wrap;
 		padding-inline: 20px;
-		justify-content: space-evenly
+		justify-content: space-evenly;
 	}
 
 	.appContainer svg {

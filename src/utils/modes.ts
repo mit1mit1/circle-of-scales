@@ -99,7 +99,7 @@ export const getIntervalLabel = (scaleNote: ScaleNote, index: number) => {
 		// Diminished
 		return `d${intervalLabel}`;
 	}
-	return '';
+	return `${scaleNote.semitonesFromRoot}s`;
 };
 
 export const ionianScale = getScale(0, diatonicIntervals);
