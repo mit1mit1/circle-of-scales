@@ -3,6 +3,7 @@
 	import type { Circle, Note, ScaleNote } from '../types';
 	import { getPositiveModulo } from '../utils/math';
 	import { westernChromaticScale } from '../utils/constants';
+	import { instrument } from '../utils/sounds';
 	const visibleCircle: Circle = {
 		xCentre: 400,
 		yCentre: 400,
@@ -111,7 +112,7 @@
 					r={30}
 					transform={`translate(${notePosition.x} ${notePosition.y})`}
 					stroke="transparent"
-					fill={index === rootNoteIndex ? "yellow" : "var(--base-background-color)"}
+					fill={index === rootNoteIndex ? 'yellow' : 'var(--base-background-color)'}
 				/>
 				<text
 					x={notePosition.x}
@@ -274,6 +275,9 @@
 				</div>
 			</div>
 		</div>
+	</div>
+	<div>
+		<button on:click={() => instrument.triggerAttackRelease('C4', '16n', '16n')}>Play</button>
 	</div>
 </div>
 

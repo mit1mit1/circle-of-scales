@@ -11,7 +11,8 @@ const config = {
 
 	kit: {
 		paths: {
-			base: dev ? '' : ''
+			base: dev ? '' : '',
+			Tone: '.yarn/cache/tone-npm-14.8.49-b98b1649ec-ffc0d81f77.zip'
 		},
 		adapter: adapter({
 			// default options are shown. On some platforms
