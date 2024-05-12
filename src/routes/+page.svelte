@@ -332,6 +332,27 @@
 						+
 					</button>
 				</div>
+				<div>
+					<button
+						on:click={() => {
+							if (bpm > 10) {
+								bpm = bpm - 20;
+							}
+						}}
+					>
+						-
+					</button>
+					<span class="noteLabel">
+						{bpm} bpm
+					</span>
+					<button
+						on:click={() => {
+							bpm = bpm + 20;
+						}}
+					>
+						+
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>

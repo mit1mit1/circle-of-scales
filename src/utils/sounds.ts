@@ -1,8 +1,20 @@
 import { pythagoreanSemitoneRatios, westernChromaticScale } from './constants';
-import type { Note, ScaleNote, SynthType } from '../types';
+import type { InstrumentSettings, Note, ScaleNote } from '../types';
 
 const DEFAULT_BEAT_DURATION = 300;
 const DEFAULT_NOTE_BEATS = 0.75;
+
+const MINIMUM_GAIN = 0.000001;
+
+const firstSynth: InstrumentSettings = {
+	attackTime: 0.1,
+	decayTime: 0.3,
+	releaseTime: 0.5,
+	maxSustainTime: 0.2,
+	maxGain: 0.1,
+	sustainGainRatio: 0.1,
+	oscillatorType: 'sine'
+};
 
 const getNoteFrequency = (rootNote: Note, semitonesFromRoot: number) => {
 	let frequencyMultiplier = 1;
@@ -21,14 +33,21 @@ const getNoteFrequency = (rootNote: Note, semitonesFromRoot: number) => {
 export const makeNote = (
 	rootNote: Note,
 	semitonesFromRoot: number,
-	startTime: number,
-	endTime: number,
-	attackTime = 0.05,
-	decayTime = 0.5,
-	decayStartTime = 0,
-	maxGain = 0.1,
-	oscillatorType: SynthType = 'triangle',
+	startTimeMilliseconds: number,
+	endTimeMilliseconds: number,
+	instrumentSettings: Partial<InstrumentSettings> = {}
 ) => {
+	const instrumentProperties = { ...firstSynth, ...instrumentSettings };
+	let { attackTime, decayTime } = { ...instrumentProperties };
+	const {
+		// release can be after end time
+		releaseTime,
+		maxSustainTime,
+		maxGain,
+		sustainGainRatio,
+		oscillatorType = 'triangle'
+	} = { ...instrumentProperties };
+	const sustainGain = maxGain * sustainGainRatio;
 	const context = new AudioContext();
 	const oscillator = context.createOscillator();
 	const volume = context.createGain();
@@ -38,21 +57,32 @@ export const makeNote = (
 	oscillator.type = oscillatorType;
 	oscillator.frequency.value = getNoteFrequency(rootNote, semitonesFromRoot);
 	oscillator.connect(volume).connect(compressor).connect(context.destination);
-
+	const maxMilliseconds = endTimeMilliseconds - startTimeMilliseconds;
+	if (attackTime * 1000 > maxMilliseconds / 2) {
+		attackTime = maxMilliseconds / (2 * 1000);
+	}
+	if ((decayTime + attackTime) * 1000 > maxMilliseconds) {
+		decayTime = (maxMilliseconds - attackTime * 1000) / 1000;
+	}
+	const sustainTime = Math.min(
+		maxSustainTime ?? 10000,
+		maxMilliseconds / 1000 - attackTime - decayTime
+	);
 	setTimeout(function () {
-		volume.gain.exponentialRampToValueAtTime(maxGain, context.currentTime + attackTime);
-		setTimeout(() => {
-			volume.gain.exponentialRampToValueAtTime(
-				0.00001,
-				context.currentTime + (endTime - startTime) / 1000 + decayTime
-			);
-		}, decayStartTime);
+		const endAttackTime = context.currentTime + attackTime;
+		volume.gain.exponentialRampToValueAtTime(maxGain, endAttackTime);
 		oscillator.start();
-	}, startTime);
-	setTimeout(function () {
-		oscillator.stop();
-		context.close();
-	}, endTime + 2000 + decayTime * 1000);
+		setTimeout(() => {
+			volume.gain.exponentialRampToValueAtTime(sustainGain, context.currentTime + decayTime);
+			setTimeout(() => {
+				volume.gain.exponentialRampToValueAtTime(MINIMUM_GAIN, context.currentTime + releaseTime);
+				setTimeout(function () {
+					oscillator.stop();
+					context.close();
+				}, releaseTime * 1000 + 2000);
+			}, sustainTime * 1000);
+		}, attackTime * 1000);
+	}, startTimeMilliseconds);
 };
 
 export const playScalePedal = (
@@ -153,7 +183,7 @@ export const playScaleDrone = (
 	scaleNotes: ScaleNote[],
 	rootNoteIndex: number,
 	beatDuration = DEFAULT_BEAT_DURATION,
-	noteBeatsLength = DEFAULT_NOTE_BEATS,
+	noteBeatsLength = DEFAULT_NOTE_BEATS
 ) => {
 	const noteDuration = beatDuration * noteBeatsLength;
 	const noteGap = beatDuration - noteDuration;
@@ -164,11 +194,12 @@ export const playScaleDrone = (
 		0,
 		noteGap,
 		noteGap + noteLength * (scaleNotes.length * 2 + 3),
-		0.1,
-		0.2,
-		noteLength * (scaleNotes.length * 2 + 2),
-		0.025,
-		"sine"
+		{
+			maxSustainTime: noteLength * (scaleNotes.length * 2 + 2),
+			oscillatorType: 'sine',
+			sustainGainRatio: 0.5,
+			maxGain: 0.0125
+		}
 	);
 	[...scaleNotes].forEach((scaleNote, index) => {
 		makeNote(
