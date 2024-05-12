@@ -7,8 +7,8 @@ export const westernChromaticScale: Note[] = [
 	{ sharpNote: 'D#', flatNote: 'E♭', preferSharp: false, defaultOctaveFrequency: 311.13 },
 	{ sharpNote: 'E', flatNote: 'E', defaultOctaveFrequency: 329.63 },
 	{ sharpNote: 'F', flatNote: 'F', defaultOctaveFrequency: 349.23 },
-	{ sharpNote: 'F#', flatNote: 'G♭', preferSharp: true, defaultOctaveFrequency: 185.00 },
-	{ sharpNote: 'G', flatNote: 'G', defaultOctaveFrequency: 196.00 },
+	{ sharpNote: 'F#', flatNote: 'G♭', preferSharp: true, defaultOctaveFrequency: 185.0 },
+	{ sharpNote: 'G', flatNote: 'G', defaultOctaveFrequency: 196.0 },
 	{ sharpNote: 'G#', flatNote: 'A♭', preferSharp: false, defaultOctaveFrequency: 207.65 },
 	{ sharpNote: 'A', flatNote: 'A', defaultOctaveFrequency: 220 },
 	{ sharpNote: 'A#', flatNote: 'B♭', preferSharp: false, defaultOctaveFrequency: 233.08 },
@@ -18,7 +18,7 @@ export const westernChromaticScale: Note[] = [
 export const diatonicIntervals = [2, 2, 1, 2, 2, 2, 1];
 export const pentatonicMajorIntervals = [2, 2, 3, 2, 3];
 
-export const semitoneRatios = [
+export const pythagoreanSemitoneRatios = [
 	1,
 	256 / 243,
 	9 / 8,

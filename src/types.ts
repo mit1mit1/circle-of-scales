@@ -17,3 +17,5 @@ export type Circle = {
 	yCentre: number,
 	radius: number,
 }
+
+export type SynthType = Exclude<OscillatorType, "custom">;

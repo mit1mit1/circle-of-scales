@@ -3,17 +3,14 @@
 	import type { Circle, Note, ScaleNote } from '../types';
 	import { getPositiveModulo } from '../utils/math';
 	import { westernChromaticScale } from '../utils/constants';
-	import { makeNote } from '../utils/sounds';
-	const noteDuration = 400;
-	const noteGap = 50;
-	const noteLength = noteDuration + noteGap;
+	import { playScaleUpDown, playScalePedal, playScaleDrone } from '../utils/sounds';
 	const visibleCircle: Circle = {
 		xCentre: 400,
 		yCentre: 400,
 		radius: 300
 	};
 
-	let isEquivilantModing = true;
+	let isEquivalentModing = true;
 
 	const notePositionCircle: Circle = {
 		...visibleCircle,
@@ -86,6 +83,8 @@
 		}
 		return scale.some((scaleNote) => scaleNote.semitonesFromRoot === semitonesFromRoot);
 	};
+
+	let bpm = 120;
 </script>
 
 <h1>
@@ -129,7 +128,7 @@
 			</g>
 		{/each}
 		{#each [...selectedScale.scale] as scaleNote, index}
-			{@const notePosition = isEquivilantModing
+			{@const notePosition = isEquivalentModing
 				? getNotePosition(
 						selectedScale.scale[
 							getPositiveModulo(
@@ -180,7 +179,7 @@
 			</g>
 		{/each}
 	</svg>
-	<div id="boxOfButtons">
+	<div class="boxOfButtons">
 		<div>
 			Root note
 			<button
@@ -236,9 +235,9 @@
 							on:click={() => {
 								selectedScale = scale;
 								rootNoteIndex = getPositiveModulo(relativeIndex, westernChromaticScale.length);
-								isEquivilantModing = true;
+								isEquivalentModing = true;
 							}}
-							class={scale === selectedScale && isEquivilantModing ? 'selectedTab' : ''}
+							class={scale === selectedScale && isEquivalentModing ? 'selectedTab' : ''}
 						>
 							<span class="noteLabel"
 								>{getNoteString(
@@ -261,9 +260,9 @@
 							on:click={() => {
 								selectedScale = scale;
 								rootNoteIndex = getPositiveModulo(relativeIndex, westernChromaticScale.length);
-								isEquivilantModing = false;
+								isEquivalentModing = false;
 							}}
-							class={scale === selectedScale && !isEquivilantModing ? 'selectedTab' : ''}
+							class={scale === selectedScale && !isEquivalentModing ? 'selectedTab' : ''}
 						>
 							<span class="noteLabel"
 								>{getNoteString(
@@ -278,53 +277,63 @@
 				</div>
 			</div>
 		</div>
-	</div>
-	<div>
-		<button
-			on:click={() => {
-				[...selectedScale.scale].forEach((scaleNote, index) => {
-					// First note is different because we're pedaling it anyway
-					if (index === 0) {
-						// Extra long note which is also root note
-						makeNote(
-							westernChromaticScale[rootNoteIndex],
-							scaleNote.semitonesFromRoot,
-							(index * 2 + 1) * noteLength + noteGap,
-							(index * 2 + 1) * noteLength + noteGap + noteDuration + noteLength
-						);
-					} else {
-						// Root note
-						makeNote(
-							westernChromaticScale[rootNoteIndex],
-							0,
-							index * 2 * noteLength + noteGap,
-							index * 2 * noteLength + noteGap + noteDuration
-						);
-						// Note
-						makeNote(
-							westernChromaticScale[rootNoteIndex],
-							scaleNote.semitonesFromRoot,
-							(index * 2 + 1) * noteLength + noteGap,
-							(index * 2 + 1) * noteLength + noteGap + noteDuration
-						);
-					}
-				});
-				// Root note
-				makeNote(
-					westernChromaticScale[rootNoteIndex],
-					0,
-					selectedScale.scale.length * 2 * noteLength + noteGap,
-					selectedScale.scale.length * 2 * noteLength + noteGap + noteDuration
-				);
-				// Octave up note
-				makeNote(
-					westernChromaticScale[rootNoteIndex],
-					westernChromaticScale.length,
-					(selectedScale.scale.length * 2 + 1) * noteLength + noteGap,
-					(selectedScale.scale.length * 2 + 1) * noteLength + noteGap + noteDuration
-				);
-			}}>Play</button
-		>
+		<div class="musicControls">
+			<div>
+				<button
+					on:click={() => {
+						playScaleUpDown(selectedScale.scale, rootNoteIndex, (60 * 1000) / bpm);
+					}}
+				>
+					▶ Scale
+				</button>
+				<button
+					on:click={() => {
+						playScalePedal(selectedScale.scale, rootNoteIndex, (60 * 1000) / bpm);
+					}}
+				>
+					▶ Scale + Pedal
+				</button>
+				<button
+					on:click={() => {
+						playScaleDrone(selectedScale.scale, rootNoteIndex, (60 * 1000) / bpm);
+					}}
+				>
+					▶ Scale + Drone
+				</button>
+				<!-- <button
+					on:click={() => {
+						playScalePedal(selectedScale.scale, rootNoteIndex, (60 * 1000) / bpm);
+					}}
+				>
+					▶ Jam
+				</button> -->
+			</div>
+		</div>
+		<div class="musicControls">
+			<div>
+				<div>
+					<button
+						on:click={() => {
+							if (bpm > 10) {
+								bpm = bpm - 20;
+							}
+						}}
+					>
+						-
+					</button>
+					<span class="noteLabel">
+						{bpm} bpm
+					</span>
+					<button
+						on:click={() => {
+							bpm = bpm + 20;
+						}}
+					>
+						+
+					</button>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -400,7 +409,7 @@
 		height: 400px;
 	}
 
-	#boxOfButtons {
+	.boxOfButtons {
 		max-width: 500px;
 	}
 
@@ -438,5 +447,15 @@
 
 	.transitionAll.hidden {
 		opacity: 0;
+	}
+
+	.musicControls {
+		margin-top: 20px;
+	}
+
+	.musicControls > div {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-evenly;
 	}
 </style>
