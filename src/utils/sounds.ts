@@ -7,7 +7,7 @@ import type { InstrumentSettings, Note, ScaleNote } from '../types';
 
 const DEFAULT_BEAT_DURATION = 300;
 const DEFAULT_NOTE_BEATS = 0.75;
-const DEFAULT_JAM_LENGTH_BEATS = 16;
+const DEFAULT_JAM_LENGTH_BEATS = 8;
 
 const MINIMUM_GAIN = 0.000001;
 
@@ -237,17 +237,55 @@ export const playScaleDrone = (
 export const jam = (
 	scaleNotes: ScaleNote[],
 	rootNoteIndex: number,
-	noteProbabilities: number[],
+	melodyProbabilities: number[],
+	bassProbabilities: number[],
 	beatDuration = DEFAULT_BEAT_DURATION,
 	numberOfBeats = DEFAULT_JAM_LENGTH_BEATS
 ) => {
-	let currentBeat = 0;
-	while (currentBeat <= numberOfBeats) {
+	let currentMelodyBeat = 0;
+	while (currentMelodyBeat <= numberOfBeats) {
 		scaleNotes.forEach((scaleNote, index) => {
-			if (index >= noteProbabilities.length) {
+			if (index >= melodyProbabilities.length) {
 				return;
 			}
-			if (Math.random() < noteProbabilities[index]) {
+			if (Math.random() < melodyProbabilities[index]) {
+				const durationSeed = Math.random();
+				let durationMultiplier = 1;
+				if (durationSeed > 0.8) {
+					durationMultiplier = 2;
+				}
+				if (durationSeed > 0.9) {
+					durationMultiplier = 4;
+				}
+				if (durationSeed > 0.95) {
+					durationMultiplier = 6;
+				}
+				if (durationSeed > 0.97) {
+					durationMultiplier = 3;
+				}
+				if (durationSeed > 0.99) {
+					durationMultiplier = 8;
+				}
+				makeNote(
+					westernChromaticScale[rootNoteIndex],
+					scaleNote.semitonesFromRoot + westernChromaticScale.length,
+					beatDuration * currentMelodyBeat,
+					beatDuration * currentMelodyBeat + beatDuration * MINIMUM_BEAT_DIVISION * durationMultiplier
+				);
+				currentMelodyBeat += MINIMUM_BEAT_DIVISION;
+			}
+		});
+		currentMelodyBeat += MINIMUM_BEAT_DIVISION;
+	}
+
+	let currentBassBeat = 0;
+
+	while (currentBassBeat <= numberOfBeats) {
+		scaleNotes.forEach((scaleNote, index) => {
+			if (index >= bassProbabilities.length) {
+				return;
+			}
+			if (Math.random() < bassProbabilities[index]) {
 				const durationSeed = Math.random();
 				let durationMultiplier = 1;
 				if (durationSeed > 0.8) {
@@ -268,11 +306,12 @@ export const jam = (
 				makeNote(
 					westernChromaticScale[rootNoteIndex],
 					scaleNote.semitonesFromRoot,
-					beatDuration * currentBeat,
-					beatDuration * currentBeat + beatDuration * MINIMUM_BEAT_DIVISION * durationMultiplier
+					beatDuration * currentBassBeat,
+					beatDuration * currentBassBeat + beatDuration * 2 * MINIMUM_BEAT_DIVISION * durationMultiplier
 				);
+				currentBassBeat += 2 * MINIMUM_BEAT_DIVISION;
 			}
 		});
-		currentBeat += MINIMUM_BEAT_DIVISION;
+		currentBassBeat += 2 * MINIMUM_BEAT_DIVISION;
 	}
 };

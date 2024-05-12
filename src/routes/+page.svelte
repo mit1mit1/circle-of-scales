@@ -3,7 +3,8 @@
 	import type { Circle, Note, ScaleNote } from '../types';
 	import { getPositiveModulo } from '../utils/math';
 	import {
-		jamProbabilityDistributions,
+	jamBassProbabilityDistributions,
+		jamMelodyProbabilityDistributions,
 		pentatonicMajorIntervals,
 		westernChromaticScale
 	} from '../utils/constants';
@@ -309,7 +310,12 @@
 						jam(
 							selectedScale.scale,
 							rootNoteIndex,
-							jamProbabilityDistributions.diatonic,
+							jamMelodyProbabilityDistributions[
+								selectedModesGroup === modeGroups[1] ? 'pentatonic' : 'diatonic'
+							],
+							jamBassProbabilityDistributions[
+								selectedModesGroup === modeGroups[1] ? 'pentatonic' : 'diatonic'
+							],
 							(60 * 1000) / bpm
 						);
 					}}
