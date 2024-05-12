@@ -3,7 +3,10 @@
 	import type { Circle, Note, ScaleNote } from '../types';
 	import { getPositiveModulo } from '../utils/math';
 	import { westernChromaticScale } from '../utils/constants';
-	import { instrument } from '../utils/sounds';
+	import { makeNote } from '../utils/sounds';
+	const noteDuration = 250;
+	const noteGap = 50;
+	const noteLength = noteDuration + noteGap;
 	const visibleCircle: Circle = {
 		xCentre: 400,
 		yCentre: 400,
@@ -277,7 +280,40 @@
 		</div>
 	</div>
 	<div>
-		<button on:click={() => instrument.triggerAttackRelease('C4', '16n', '16n')}>Play</button>
+		<button
+			on:click={() => {
+				[...selectedScale.scale].forEach((scaleNote, index) => {
+					// Root note
+					makeNote(
+						westernChromaticScale[rootNoteIndex],
+						0,
+						index * 2 * noteLength + noteGap,
+						index * 2 * noteLength + noteGap + noteDuration
+					);
+					// Note
+					makeNote(
+						westernChromaticScale[rootNoteIndex],
+						scaleNote.semitonesFromRoot,
+						(index * 2 + 1) * noteLength + noteGap,
+						(index * 2 + 1) * noteLength + noteGap + noteDuration
+					);
+				});
+				// Root note
+				makeNote(
+					westernChromaticScale[rootNoteIndex],
+					0,
+					selectedScale.scale.length * 2 * noteLength + noteGap,
+					selectedScale.scale.length * 2 * noteLength + noteGap + noteDuration
+				);
+				// Octave up note
+				makeNote(
+					westernChromaticScale[rootNoteIndex],
+					westernChromaticScale.length,
+					(selectedScale.scale.length * 2 + 1) * noteLength + noteGap,
+					(selectedScale.scale.length * 2 + 1) * noteLength + noteGap + noteDuration
+				);
+			}}>Play</button
+		>
 	</div>
 </div>
 

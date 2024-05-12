@@ -2,6 +2,7 @@ export interface Note {
 	sharpNote: string;
 	flatNote: string;
 	preferSharp?: boolean;
+	defaultOctaveFrequency: number;
 }
 
 export interface ScaleNote {

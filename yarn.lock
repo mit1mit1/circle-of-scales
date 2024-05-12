@@ -5,15 +5,6 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@babel/runtime@npm:^7.24.4":
-  version: 7.24.4
-  resolution: "@babel/runtime@npm:7.24.4"
-  dependencies:
-    regenerator-runtime: ^0.14.0
-  checksum: 2f27d4c0ffac7ae7999ac0385e1106f2a06992a8bdcbf3da06adcac7413863cd08c198c2e4e970041bbea849e17f02e1df18875539b6afba76c781b6b59a07c3
-  languageName: node
-  linkType: hard
-
 "@bcoe/v8-coverage@npm:^0.2.3":
   version: 0.2.3
   resolution: "@bcoe/v8-coverage@npm:0.2.3"
@@ -813,16 +804,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"automation-events@npm:^7.0.4":
-  version: 7.0.4
-  resolution: "automation-events@npm:7.0.4"
-  dependencies:
-    "@babel/runtime": ^7.24.4
-    tslib: ^2.6.2
-  checksum: c7e63973bd6cebc0eaa7ca966bd79e6a6e0f7389204aa7dd4bb7093dfccab4cbe1422659d1e83f1e62b41363327eee44843906f5a6377ed5c8a133af9855ae18
-  languageName: node
-  linkType: hard
-
 "axe-core@npm:^4.5.1":
   version: 4.6.3
   resolution: "axe-core@npm:4.6.3"
@@ -1059,15 +1040,6 @@ __metadata:
     prettier-plugin-svelte: ^2.8.1
     svelte: ^3.54.0
     svelte-check: ^3.0.1
-    tone: ^14.7.77
-    tonejs-instrument-clarinet-mp3: ^1.1.2
-    tonejs-instrument-guitar-acoustic-mp3: ^1.1.2
-    tonejs-instrument-guitar-electric-mp3: ^1.1.1
-    tonejs-instrument-guitar-nylon-mp3: ^1.1.1
-    tonejs-instrument-harmonium-mp3: ^1.1.1
-    tonejs-instrument-harp-mp3: ^1.1.1
-    tonejs-instrument-piano-mp3: ^1.1.2
-    tonejs-instrument-violin-mp3: ^1.1.1
     tslib: ^2.4.1
     typescript: ^4.9.3
     vite: ^4.0.0
@@ -3026,13 +2998,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"regenerator-runtime@npm:^0.14.0":
-  version: 0.14.1
-  resolution: "regenerator-runtime@npm:0.14.1"
-  checksum: 9f57c93277b5585d3c83b0cf76be47b473ae8c6d9142a46ce8b0291a04bb2cf902059f0f8445dcabb3fb7378e5fe4bb4ea1e008876343d42e46d3b484534ce38
-  languageName: node
-  linkType: hard
-
 "regexpp@npm:^3.2.0":
   version: 3.2.0
   resolution: "regexpp@npm:3.2.0"
@@ -3364,17 +3329,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"standardized-audio-context@npm:^25.3.29":
-  version: 25.3.70
-  resolution: "standardized-audio-context@npm:25.3.70"
-  dependencies:
-    "@babel/runtime": ^7.24.4
-    automation-events: ^7.0.4
-    tslib: ^2.6.2
-  checksum: 2374db94d108c9a962d54cd058427149c35ff98b672b35a2e781d0569d6339b5c9961967be8cc97c107770134f3e94011412d5e9f83c4aef4272a51266337b11
-  languageName: node
-  linkType: hard
-
 "std-env@npm:^3.3.1":
   version: 3.3.2
   resolution: "std-env@npm:3.3.2"
@@ -3641,88 +3595,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tone@npm:^14.7.77":
-  version: 14.8.49
-  resolution: "tone@npm:14.8.49"
-  dependencies:
-    standardized-audio-context: ^25.3.29
-    tslib: ^2.3.1
-  checksum: ffc0d81f77e9030b5c5074b690f415a72be415edcda5ef01768de1ed89a7176392759ae1aae1cd70c5540da5616754b9c17fdf2a25c1d85dcb0ff64d9cac99c6
-  languageName: node
-  linkType: hard
-
-"tonejs-instrument-clarinet-mp3@npm:^1.1.2":
-  version: 1.1.2
-  resolution: "tonejs-instrument-clarinet-mp3@npm:1.1.2"
-  peerDependencies:
-    tone: ^14.7.77
-  checksum: 01494309b5fe8ba5f8968e93a8777e5c160457fb0ad5852787fb30df8eab4d28db5201ecf26dbd55678e2b614b22913e6399a9f394357a6808d4460566c695ab
-  languageName: node
-  linkType: hard
-
-"tonejs-instrument-guitar-acoustic-mp3@npm:^1.1.2":
-  version: 1.1.2
-  resolution: "tonejs-instrument-guitar-acoustic-mp3@npm:1.1.2"
-  peerDependencies:
-    tone: ^14.7.77
-  checksum: 78c581254c64e8cdcbf6c7c7d5bea6a10268c0809d104ecd8115ab9f61a851273191bc4db0051d007b14a636623054ea298b0d792652dc53206754760a7a8c0b
-  languageName: node
-  linkType: hard
-
-"tonejs-instrument-guitar-electric-mp3@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "tonejs-instrument-guitar-electric-mp3@npm:1.1.1"
-  peerDependencies:
-    tone: ^14.7.77
-  checksum: 0cb3595d21387ecde6a2826b0fbd43fbcbcc9b57555ca589416a012cff0b4394c773c4d2c0ed131831a4264ee64092d2509891ba63f23aecfb2a912e6fdbb6be
-  languageName: node
-  linkType: hard
-
-"tonejs-instrument-guitar-nylon-mp3@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "tonejs-instrument-guitar-nylon-mp3@npm:1.1.1"
-  peerDependencies:
-    tone: ^14.7.77
-  checksum: d280ba4d22fbb51a2c5a4c5cd3010783a5b96953826667ebff393eb0bf38f5b138b355e1d8726f5f293704e4009276c697cd377a736a3801e7a45566c13afc0d
-  languageName: node
-  linkType: hard
-
-"tonejs-instrument-harmonium-mp3@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "tonejs-instrument-harmonium-mp3@npm:1.1.1"
-  peerDependencies:
-    tone: ^14.7.77
-  checksum: 0628beff9c5fdf04295bae0faef0cba723bb6e49c8a7dd0e80fb18a344a1d99e4a985997f3ad2433148e58ae4d7b7007ae64b5811e0649da869ba27212f61a5d
-  languageName: node
-  linkType: hard
-
-"tonejs-instrument-harp-mp3@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "tonejs-instrument-harp-mp3@npm:1.1.1"
-  peerDependencies:
-    tone: ^14.7.77
-  checksum: 058ba5557c2a3326cda845f5adf8464a78b1faad4bc464a08dffd2ad81c215908842bcfcce0ef2a8122ce667d562d21928722e50583978e31bb5da67869e2af8
-  languageName: node
-  linkType: hard
-
-"tonejs-instrument-piano-mp3@npm:^1.1.2":
-  version: 1.1.2
-  resolution: "tonejs-instrument-piano-mp3@npm:1.1.2"
-  peerDependencies:
-    tone: ^14.7.77
-  checksum: 48b10cee51b87d7e2078fd49b2977a7f998cf8db2e566260f22dc3e30306eabf10f8b9f3d8fd65a0272d5588ae2c4473de87095ca1dc7a1585c1a607d65e3551
-  languageName: node
-  linkType: hard
-
-"tonejs-instrument-violin-mp3@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "tonejs-instrument-violin-mp3@npm:1.1.1"
-  peerDependencies:
-    tone: ^14.7.77
-  checksum: f6c35703f63f69f2b583df7d9fe56931bdded315f6f5f5458804ca11182f1220ca0940755bb38e7ba1981564a56434382898209a2c11453aad47aef858b98e72
-  languageName: node
-  linkType: hard
-
 "totalist@npm:^3.0.0":
   version: 3.0.0
   resolution: "totalist@npm:3.0.0"
@@ -3755,13 +3627,6 @@ __metadata:
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: dbe628ef87f66691d5d2959b3e41b9ca0045c3ee3c7c7b906cc1e328b39f199bb1ad9e671c39025bd56122ac57dfbf7385a94843b1cc07c60a4db74795829acd
-  languageName: node
-  linkType: hard
-
-"tslib@npm:^2.3.1, tslib@npm:^2.6.2":
-  version: 2.6.2
-  resolution: "tslib@npm:2.6.2"
-  checksum: 329ea56123005922f39642318e3d1f0f8265d1e7fcb92c633e0809521da75eeaca28d2cf96d7248229deb40e5c19adf408259f4b9640afd20d13aecc1430f3ad
   languageName: node
   linkType: hard
 
