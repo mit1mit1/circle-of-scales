@@ -1,8 +1,13 @@
-import { pythagoreanSemitoneRatios, westernChromaticScale } from './constants';
+import {
+	MINIMUM_BEAT_DIVISION,
+	pythagoreanSemitoneRatios,
+	westernChromaticScale
+} from './constants';
 import type { InstrumentSettings, Note, ScaleNote } from '../types';
 
 const DEFAULT_BEAT_DURATION = 300;
 const DEFAULT_NOTE_BEATS = 0.75;
+const DEFAULT_JAM_LENGTH_BEATS = 16;
 
 const MINIMUM_GAIN = 0.000001;
 
@@ -37,6 +42,9 @@ export const makeNote = (
 	endTimeMilliseconds: number,
 	instrumentSettings: Partial<InstrumentSettings> = {}
 ) => {
+	if (endTimeMilliseconds < startTimeMilliseconds) {
+		alert('WTF?');
+	}
 	const instrumentProperties = { ...firstSynth, ...instrumentSettings };
 	let { attackTime, decayTime } = { ...instrumentProperties };
 	const {
@@ -58,16 +66,16 @@ export const makeNote = (
 	oscillator.frequency.value = getNoteFrequency(rootNote, semitonesFromRoot);
 	oscillator.connect(volume).connect(compressor).connect(context.destination);
 	const maxMilliseconds = endTimeMilliseconds - startTimeMilliseconds;
-	if (attackTime * 1000 > maxMilliseconds / 2) {
+	if (attackTime > maxMilliseconds / (2 * 1000)) {
 		attackTime = maxMilliseconds / (2 * 1000);
 	}
-	if ((decayTime + attackTime) * 1000 > maxMilliseconds) {
-		decayTime = (maxMilliseconds - attackTime * 1000) / 1000;
+	if (decayTime + attackTime > maxMilliseconds / 1000) {
+		decayTime = maxMilliseconds / 1000 - attackTime;
 	}
-	const sustainTime = Math.min(
-		maxSustainTime ?? 10000,
-		maxMilliseconds / 1000 - attackTime - decayTime
-	);
+	let sustainTime = maxSustainTime ?? 10000;
+	if (sustainTime > maxMilliseconds / 1000 - attackTime - decayTime) {
+		sustainTime = maxMilliseconds / 1000 - attackTime - decayTime;
+	}
 	setTimeout(function () {
 		const endAttackTime = context.currentTime + attackTime;
 		volume.gain.exponentialRampToValueAtTime(maxGain, endAttackTime);
@@ -91,9 +99,9 @@ export const playScalePedal = (
 	beatDuration = DEFAULT_BEAT_DURATION,
 	noteBeatsLength = DEFAULT_NOTE_BEATS
 ) => {
-	const noteDuration = beatDuration * noteBeatsLength;
-	const noteGap = beatDuration - noteDuration;
-	const noteLength = beatDuration;
+	const noteDuration = beatDuration * 0.5 * noteBeatsLength;
+	const noteGap = beatDuration * 0.5 - noteDuration;
+	const noteLength = beatDuration * 0.5;
 	[...scaleNotes].forEach((scaleNote, index) => {
 		// First note is different because we're pedaling it anyway
 		if (index === 0) {
@@ -143,9 +151,9 @@ export const playScaleUpDown = (
 	beatDuration = DEFAULT_BEAT_DURATION,
 	noteBeatsLength = DEFAULT_NOTE_BEATS
 ) => {
-	const noteDuration = beatDuration * noteBeatsLength;
-	const noteGap = beatDuration - noteDuration;
-	const noteLength = beatDuration;
+	const noteDuration = beatDuration * 0.5 * noteBeatsLength;
+	const noteGap = beatDuration * 0.5 - noteDuration;
+	const noteLength = beatDuration * 0.5;
 
 	// Extra long note which is also root note
 	makeNote(
@@ -185,9 +193,9 @@ export const playScaleDrone = (
 	beatDuration = DEFAULT_BEAT_DURATION,
 	noteBeatsLength = DEFAULT_NOTE_BEATS
 ) => {
-	const noteDuration = beatDuration * noteBeatsLength;
-	const noteGap = beatDuration - noteDuration;
-	const noteLength = beatDuration;
+	const noteDuration = beatDuration * 0.5 * noteBeatsLength;
+	const noteGap = beatDuration * 0.5 - noteDuration;
+	const noteLength = beatDuration * 0.5;
 
 	makeNote(
 		westernChromaticScale[rootNoteIndex],
@@ -224,4 +232,47 @@ export const playScaleDrone = (
 			(index + scaleNotes.length + 3) * noteLength + noteGap + noteDuration + noteLength
 		);
 	});
+};
+
+export const jam = (
+	scaleNotes: ScaleNote[],
+	rootNoteIndex: number,
+	noteProbabilities: number[],
+	beatDuration = DEFAULT_BEAT_DURATION,
+	numberOfBeats = DEFAULT_JAM_LENGTH_BEATS
+) => {
+	let currentBeat = 0;
+	while (currentBeat <= numberOfBeats) {
+		scaleNotes.forEach((scaleNote, index) => {
+			if (index >= noteProbabilities.length) {
+				return;
+			}
+			if (Math.random() < noteProbabilities[index]) {
+				const durationSeed = Math.random();
+				let durationMultiplier = 1;
+				if (durationSeed > 0.8) {
+					durationMultiplier = 2;
+				}
+				if (durationSeed > 0.9) {
+					durationMultiplier = 4;
+				}
+				if (durationSeed > 0.95) {
+					durationMultiplier = 6;
+				}
+				if (durationSeed > 0.97) {
+					durationMultiplier = 3;
+				}
+				if (durationSeed > 0.99) {
+					durationMultiplier = 8;
+				}
+				makeNote(
+					westernChromaticScale[rootNoteIndex],
+					scaleNote.semitonesFromRoot,
+					beatDuration * currentBeat,
+					beatDuration * currentBeat + beatDuration * MINIMUM_BEAT_DIVISION * durationMultiplier
+				);
+			}
+		});
+		currentBeat += MINIMUM_BEAT_DIVISION;
+	}
 };

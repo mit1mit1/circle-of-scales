@@ -32,3 +32,10 @@ export const pythagoreanSemitoneRatios = [
 	16 / 9,
 	243 / 128
 ];
+
+export const jamProbabilityDistributions = {
+	pentatonic: [0.3, 0.05, 0.05, 0.2, 0.1],
+	diatonic: [0.3, 0.05, 0.1, 0.03, 0.075, 0.03, 0.05]
+};
+
+export const MINIMUM_BEAT_DIVISION = 0.25;

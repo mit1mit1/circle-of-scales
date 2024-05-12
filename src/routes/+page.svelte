@@ -2,8 +2,12 @@
 	import { modeGroups, getIntervalLabel } from '../utils/modes';
 	import type { Circle, Note, ScaleNote } from '../types';
 	import { getPositiveModulo } from '../utils/math';
-	import { westernChromaticScale } from '../utils/constants';
-	import { playScaleUpDown, playScalePedal, playScaleDrone } from '../utils/sounds';
+	import {
+		jamProbabilityDistributions,
+		pentatonicMajorIntervals,
+		westernChromaticScale
+	} from '../utils/constants';
+	import { playScaleUpDown, playScalePedal, playScaleDrone, jam } from '../utils/sounds';
 	const visibleCircle: Circle = {
 		xCentre: 400,
 		yCentre: 400,
@@ -84,7 +88,7 @@
 		return scale.some((scaleNote) => scaleNote.semitonesFromRoot === semitonesFromRoot);
 	};
 
-	let bpm = 120;
+	let bpm = 90;
 </script>
 
 <h1>
@@ -300,38 +304,22 @@
 				>
 					▶ Scale + Drone
 				</button>
-				<!-- <button
+				<button
 					on:click={() => {
-						playScalePedal(selectedScale.scale, rootNoteIndex, (60 * 1000) / bpm);
+						jam(
+							selectedScale.scale,
+							rootNoteIndex,
+							jamProbabilityDistributions.diatonic,
+							(60 * 1000) / bpm
+						);
 					}}
 				>
 					▶ Jam
-				</button> -->
+				</button>
 			</div>
 		</div>
 		<div class="musicControls">
 			<div>
-				<div>
-					<button
-						on:click={() => {
-							if (bpm > 10) {
-								bpm = bpm - 20;
-							}
-						}}
-					>
-						-
-					</button>
-					<span class="noteLabel">
-						{bpm} bpm
-					</span>
-					<button
-						on:click={() => {
-							bpm = bpm + 20;
-						}}
-					>
-						+
-					</button>
-				</div>
 				<div>
 					<button
 						on:click={() => {
