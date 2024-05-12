@@ -4,7 +4,7 @@
 	import { getPositiveModulo } from '../utils/math';
 	import { westernChromaticScale } from '../utils/constants';
 	import { makeNote } from '../utils/sounds';
-	const noteDuration = 250;
+	const noteDuration = 400;
 	const noteGap = 50;
 	const noteLength = noteDuration + noteGap;
 	const visibleCircle: Circle = {
@@ -283,20 +283,31 @@
 		<button
 			on:click={() => {
 				[...selectedScale.scale].forEach((scaleNote, index) => {
-					// Root note
-					makeNote(
-						westernChromaticScale[rootNoteIndex],
-						0,
-						index * 2 * noteLength + noteGap,
-						index * 2 * noteLength + noteGap + noteDuration
-					);
-					// Note
-					makeNote(
-						westernChromaticScale[rootNoteIndex],
-						scaleNote.semitonesFromRoot,
-						(index * 2 + 1) * noteLength + noteGap,
-						(index * 2 + 1) * noteLength + noteGap + noteDuration
-					);
+					// First note is different because we're pedaling it anyway
+					if (index === 0) {
+						// Extra long note which is also root note
+						makeNote(
+							westernChromaticScale[rootNoteIndex],
+							scaleNote.semitonesFromRoot,
+							(index * 2 + 1) * noteLength + noteGap,
+							(index * 2 + 1) * noteLength + noteGap + noteDuration + noteLength
+						);
+					} else {
+						// Root note
+						makeNote(
+							westernChromaticScale[rootNoteIndex],
+							0,
+							index * 2 * noteLength + noteGap,
+							index * 2 * noteLength + noteGap + noteDuration
+						);
+						// Note
+						makeNote(
+							westernChromaticScale[rootNoteIndex],
+							scaleNote.semitonesFromRoot,
+							(index * 2 + 1) * noteLength + noteGap,
+							(index * 2 + 1) * noteLength + noteGap + noteDuration
+						);
+					}
 				});
 				// Root note
 				makeNote(
