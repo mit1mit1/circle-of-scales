@@ -3,17 +3,25 @@
 	import type { Circle, Note, ScaleNote } from '../types';
 	import { getPositiveModulo } from '../utils/math';
 	import {
-	jamBassProbabilityDistributions,
+		jamBassProbabilityDistributions,
 		jamMelodyProbabilityDistributions,
-		pentatonicMajorIntervals,
 		westernChromaticScale
 	} from '../utils/constants';
 	import { playScaleUpDown, playScalePedal, playScaleDrone, jam } from '../utils/sounds';
+	import { currentlyPlayingRelativeToRoot } from '../store';
+
 	const visibleCircle: Circle = {
 		xCentre: 400,
 		yCentre: 400,
 		radius: 300
 	};
+
+	let highlightedRelativeToRoot: Record<string, number> = {};
+
+	currentlyPlayingRelativeToRoot.subscribe((newPlayingNotes) => {
+		console.log('newPlayingNotes are', newPlayingNotes);
+		highlightedRelativeToRoot = newPlayingNotes;
+	});
 
 	let isEquivalentModing = true;
 
@@ -120,6 +128,25 @@
 					transform={`translate(${notePosition.x} ${notePosition.y})`}
 					stroke="transparent"
 					fill={index === rootNoteIndex ? 'yellow' : 'var(--base-background-color)'}
+				/>
+				<circle
+					style="stroke-width:1.6871;stroke-miterlimit:10;"
+					cx={0}
+					cy={0}
+					r={30}
+					transform={`translate(${notePosition.x} ${notePosition.y})`}
+					stroke="transparent"
+					fill={highlightedRelativeToRoot[
+						`${getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length)}`
+					] > 0
+						? 'green'
+						: 'var(--base-background-color)'}
+					opacity={highlightedRelativeToRoot[
+						`${getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length)}`
+					] > 0
+						? '0.5'
+						: '0'}
+					class="transitionAllQuick"
 				/>
 				<text
 					x={notePosition.x}
@@ -458,6 +485,14 @@
 		-ms-transition: all 500ms ease;
 		-o-transition: all 500ms ease;
 		transition: all 500ms ease-in-out;
+	}
+
+	.transitionAllQuick {
+		-webkit-transition: all 60ms ease-out;
+		-moz-transition: all 60ms ease-out;
+		-ms-transition: all 60ms ease-out;
+		-o-transition: all 60ms ease-out;
+		transition: all 60ms ease-out;
 	}
 
 	.transitionAll.hidden {

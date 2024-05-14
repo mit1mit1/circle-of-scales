@@ -4,10 +4,12 @@ import {
 	westernChromaticScale
 } from './constants';
 import type { InstrumentSettings, Note, ScaleNote } from '../types';
+import { currentlyPlayingRelativeToRoot } from '../store';
+import { getPositiveModulo } from './math';
 
 const DEFAULT_BEAT_DURATION = 300;
 const DEFAULT_NOTE_BEATS = 0.75;
-const DEFAULT_JAM_LENGTH_BEATS = 8;
+const DEFAULT_JAM_LENGTH_BEATS = 12;
 
 const MINIMUM_GAIN = 0.000001;
 
@@ -20,6 +22,16 @@ const firstSynth: InstrumentSettings = {
 	sustainGainRatio: 0.1,
 	oscillatorType: 'sine'
 };
+
+// const violinSynth: InstrumentSettings = {
+// 	attackTime: 2,
+// 	decayTime: 0.03,
+// 	releaseTime: 0.2,
+// 	maxSustainTime: 0.2,
+// 	maxGain: 0.1,
+// 	sustainGainRatio: 0.1,
+// 	oscillatorType: 'sine'
+// };
 
 const getNoteFrequency = (rootNote: Note, semitonesFromRoot: number) => {
 	let frequencyMultiplier = 1;
@@ -35,7 +47,7 @@ const getNoteFrequency = (rootNote: Note, semitonesFromRoot: number) => {
 	return rootNote.defaultOctaveFrequency * frequencyMultiplier;
 };
 
-export const makeNote = (
+export const playNote = (
 	rootNote: Note,
 	semitonesFromRoot: number,
 	startTimeMilliseconds: number,
@@ -43,7 +55,8 @@ export const makeNote = (
 	instrumentSettings: Partial<InstrumentSettings> = {}
 ) => {
 	if (endTimeMilliseconds < startTimeMilliseconds) {
-		alert('WTF?');
+		console.log('Warning: note end time earlier than start time');
+		return;
 	}
 	const instrumentProperties = { ...firstSynth, ...instrumentSettings };
 	let { attackTime, decayTime } = { ...instrumentProperties };
@@ -79,11 +92,46 @@ export const makeNote = (
 	setTimeout(function () {
 		const endAttackTime = context.currentTime + attackTime;
 		volume.gain.exponentialRampToValueAtTime(maxGain, endAttackTime);
+		currentlyPlayingRelativeToRoot.update((current) => {
+			return {
+				...current,
+				[getPositiveModulo(semitonesFromRoot, westernChromaticScale.length)]:
+					(current[`${semitonesFromRoot}`] ?? 0) + 1
+			};
+		});
 		oscillator.start();
 		setTimeout(() => {
 			volume.gain.exponentialRampToValueAtTime(sustainGain, context.currentTime + decayTime);
 			setTimeout(() => {
 				volume.gain.exponentialRampToValueAtTime(MINIMUM_GAIN, context.currentTime + releaseTime);
+				currentlyPlayingRelativeToRoot.update((current) => {
+					const newNumber = Math.max((current[`${semitonesFromRoot}`] ?? 0) - 1, 0);
+					return {
+						...current,
+						[getPositiveModulo(semitonesFromRoot, westernChromaticScale.length)]: newNumber
+					};
+					// const indexOfCurrentNote = current.indexOf(semitonesFromRoot);
+					// console.log(
+					// 	'removing note',
+					// 	semitonesFromRoot,
+					// 	'from',
+					// 	current,
+					// 	'index is',
+					// 	indexOfCurrentNote
+					// );
+					// if (indexOfCurrentNote > -1) {
+					// 	if (current.length === 1) {
+					// 		return [];
+					// 	}
+					// 	// only splice array when item is found
+					// 	console.log('found at', indexOfCurrentNote);
+					// 	return [...current].splice(indexOfCurrentNote, 1);
+
+					// 	// 2nd parameter means remove one item only
+					// }
+					// console.log("WARNING: couldn't find ", semitonesFromRoot, 'in', current);
+					// return current;
+				});
 				setTimeout(function () {
 					oscillator.stop();
 					context.close();
@@ -106,7 +154,7 @@ export const playScalePedal = (
 		// First note is different because we're pedaling it anyway
 		if (index === 0) {
 			// Extra long note which is also root note
-			makeNote(
+			playNote(
 				westernChromaticScale[rootNoteIndex],
 				scaleNote.semitonesFromRoot,
 				index * 2 * noteLength + noteGap,
@@ -114,14 +162,14 @@ export const playScalePedal = (
 			);
 		} else {
 			// Root note
-			makeNote(
+			playNote(
 				westernChromaticScale[rootNoteIndex],
 				0,
 				index * 2 * noteLength + noteGap,
 				index * 2 * noteLength + noteGap + noteDuration
 			);
 			// Note
-			makeNote(
+			playNote(
 				westernChromaticScale[rootNoteIndex],
 				scaleNote.semitonesFromRoot,
 				(index * 2 + 1) * noteLength + noteGap,
@@ -130,14 +178,14 @@ export const playScalePedal = (
 		}
 	});
 	// Root note
-	makeNote(
+	playNote(
 		westernChromaticScale[rootNoteIndex],
 		0,
 		scaleNotes.length * 2 * noteLength + noteGap,
 		scaleNotes.length * 2 * noteLength + noteGap + noteDuration
 	);
 	// Octave up note
-	makeNote(
+	playNote(
 		westernChromaticScale[rootNoteIndex],
 		westernChromaticScale.length,
 		(scaleNotes.length * 2 + 1) * noteLength + noteGap,
@@ -156,14 +204,14 @@ export const playScaleUpDown = (
 	const noteLength = beatDuration * 0.5;
 
 	// Extra long note which is also root note
-	makeNote(
+	playNote(
 		westernChromaticScale[rootNoteIndex],
 		scaleNotes[0].semitonesFromRoot,
 		noteGap,
 		noteLength + noteGap + noteDuration + noteLength
 	);
 	[...scaleNotes].forEach((scaleNote, index) => {
-		makeNote(
+		playNote(
 			westernChromaticScale[rootNoteIndex],
 			scaleNote.semitonesFromRoot,
 			(index + 2) * noteLength + noteGap,
@@ -171,14 +219,14 @@ export const playScaleUpDown = (
 		);
 	});
 	// Octave up note
-	makeNote(
+	playNote(
 		westernChromaticScale[rootNoteIndex],
 		westernChromaticScale.length,
 		(scaleNotes.length + 2) * noteLength + noteGap,
 		(scaleNotes.length + 2) * noteLength + noteGap + noteDuration
 	);
 	[...scaleNotes].reverse().forEach((scaleNote, index) => {
-		makeNote(
+		playNote(
 			westernChromaticScale[rootNoteIndex],
 			scaleNote.semitonesFromRoot,
 			(index + scaleNotes.length + 3) * noteLength + noteGap,
@@ -197,7 +245,7 @@ export const playScaleDrone = (
 	const noteGap = beatDuration * 0.5 - noteDuration;
 	const noteLength = beatDuration * 0.5;
 
-	makeNote(
+	playNote(
 		westernChromaticScale[rootNoteIndex],
 		0,
 		noteGap,
@@ -210,7 +258,7 @@ export const playScaleDrone = (
 		}
 	);
 	[...scaleNotes].forEach((scaleNote, index) => {
-		makeNote(
+		playNote(
 			westernChromaticScale[rootNoteIndex],
 			scaleNote.semitonesFromRoot,
 			(index + 2) * noteLength + noteGap,
@@ -218,14 +266,14 @@ export const playScaleDrone = (
 		);
 	});
 	// Octave up note
-	makeNote(
+	playNote(
 		westernChromaticScale[rootNoteIndex],
 		westernChromaticScale.length,
 		(scaleNotes.length + 2) * noteLength + noteGap,
 		(scaleNotes.length + 2) * noteLength + noteGap + noteDuration
 	);
 	[...scaleNotes].reverse().forEach((scaleNote, index) => {
-		makeNote(
+		playNote(
 			westernChromaticScale[rootNoteIndex],
 			scaleNote.semitonesFromRoot,
 			(index + scaleNotes.length + 3) * noteLength + noteGap,
@@ -266,11 +314,12 @@ export const jam = (
 				if (durationSeed > 0.99) {
 					durationMultiplier = 8;
 				}
-				makeNote(
+				playNote(
 					westernChromaticScale[rootNoteIndex],
 					scaleNote.semitonesFromRoot + westernChromaticScale.length,
 					beatDuration * currentMelodyBeat,
-					beatDuration * currentMelodyBeat + beatDuration * MINIMUM_BEAT_DIVISION * durationMultiplier
+					beatDuration * currentMelodyBeat +
+						beatDuration * MINIMUM_BEAT_DIVISION * durationMultiplier
 				);
 				currentMelodyBeat += MINIMUM_BEAT_DIVISION;
 			}
@@ -303,11 +352,12 @@ export const jam = (
 				if (durationSeed > 0.99) {
 					durationMultiplier = 8;
 				}
-				makeNote(
+				playNote(
 					westernChromaticScale[rootNoteIndex],
 					scaleNote.semitonesFromRoot,
 					beatDuration * currentBassBeat,
-					beatDuration * currentBassBeat + beatDuration * 2 * MINIMUM_BEAT_DIVISION * durationMultiplier
+					beatDuration * currentBassBeat +
+						beatDuration * 2 * MINIMUM_BEAT_DIVISION * durationMultiplier
 				);
 				currentBassBeat += 2 * MINIMUM_BEAT_DIVISION;
 			}
