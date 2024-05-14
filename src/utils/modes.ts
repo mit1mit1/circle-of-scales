@@ -5,7 +5,8 @@ import {
 	hexatonicMinorBluesIntervals,
 	jamBassProbabilityDistributions,
 	jamMelodyProbabilityDistributions,
-	pentatonicMajorIntervals
+	pentatonicMajorIntervals,
+	westernChromaticScale
 } from './constants';
 
 const sumIntervals = (startIndex: number, endIndex: number, intervals: number[]) => {
@@ -73,38 +74,62 @@ const getScale = (startRelativeToIonian: number, intervals: number[]) => {
 	return scale;
 };
 
-export const getIntervalLabel = (scaleNote: ScaleNote, index: number) => {
-	const intervalLabel = index + 1;
+export const getDiatonicIntervalLabel = (diff: number, intervalIndex: number) => {
+	const intervalN = intervalIndex + 1;
 
-	const diff = scaleNote.semitonesFromRoot - sumIntervals(0, index, diatonicIntervals);
 	if (diff === 1) {
 		// Augmented
-		return `A${intervalLabel}`;
+		return `A${intervalN}`;
 	}
 
 	const perfectIntervals = [1, 4, 5];
-	if (perfectIntervals.includes(intervalLabel)) {
+	if (perfectIntervals.includes(intervalN)) {
 		if (diff === 0) {
 			// Perfect
-			return `P${intervalLabel}`;
+			return `P${intervalN}`;
 		}
 		if (diff === -1) {
 			// Diminished
-			return `d${intervalLabel}`;
+			return `d${intervalN}`;
 		}
 	}
 	if (diff === 0) {
 		// Major
-		return `M${intervalLabel}`;
+		return `M${intervalN}`;
 	}
 	if (diff === -1) {
 		// Minor
-		return `m${intervalLabel}`;
+		return `m${intervalN}`;
 	}
 	if (diff === -2) {
 		// Diminished
-		return `d${intervalLabel}`;
+		return `d${intervalN}`;
 	}
+};
+
+export const getIntervalLabel = (scaleNote: ScaleNote, index: number) => {
+	const diff = scaleNote.semitonesFromRoot - sumIntervals(0, index, diatonicIntervals);
+	const diatonicIntervalLabel = getDiatonicIntervalLabel(diff, index);
+
+	if (diatonicIntervalLabel) {
+		return diatonicIntervalLabel;
+	}
+
+	let testDiatonicIndex = 0;
+
+	while (testDiatonicIndex < diatonicIntervals.length) {
+		const forcedDiatonicDiff = scaleNote.semitonesFromRoot - sumIntervals(0, testDiatonicIndex, diatonicIntervals)
+		const forcedDiatonicIntervalLabel = getDiatonicIntervalLabel(
+			forcedDiatonicDiff,
+			testDiatonicIndex
+		);
+
+		if (forcedDiatonicIntervalLabel) {
+			return forcedDiatonicIntervalLabel;
+		}
+		testDiatonicIndex++;
+	}
+
 	return `${scaleNote.semitonesFromRoot}s`;
 };
 
