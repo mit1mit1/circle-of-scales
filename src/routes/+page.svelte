@@ -2,11 +2,7 @@
 	import { modeGroups, getIntervalLabel } from '../utils/modes';
 	import type { Circle, Note, ScaleNote } from '../types';
 	import { getPositiveModulo } from '../utils/math';
-	import {
-		jamBassProbabilityDistributions,
-		jamMelodyProbabilityDistributions,
-		westernChromaticScale
-	} from '../utils/constants';
+	import { westernChromaticScale } from '../utils/constants';
 	import { playScaleUpDown, playScalePedal, playScaleDrone, jam } from '../utils/sounds';
 	import { currentlyPlayingRelativeToRoot } from '../store';
 
@@ -19,7 +15,6 @@
 	let highlightedRelativeToRoot: Record<string, number> = {};
 
 	currentlyPlayingRelativeToRoot.subscribe((newPlayingNotes) => {
-		console.log('newPlayingNotes are', newPlayingNotes);
 		highlightedRelativeToRoot = newPlayingNotes;
 	});
 
@@ -97,7 +92,7 @@
 		return scale.some((scaleNote) => scaleNote.semitonesFromRoot === semitonesFromRoot);
 	};
 
-	let bpm = 90;
+	let bpm = 70;
 </script>
 
 <h1>

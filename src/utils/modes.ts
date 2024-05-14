@@ -205,26 +205,6 @@ export const minorHexatonicBluesModes = [
 		name: 'Major',
 		scale: hexatonicMajorBlues,
 		rootIntervalToIonian: sumIntervals(0, 1, hexatonicMinorBluesIntervals)
-	},
-	{
-		name: 'Weird 3',
-		scale: blues3,
-		rootIntervalToIonian: sumIntervals(0, 2, hexatonicMinorBluesIntervals)
-	},
-	{
-		name: 'Weird 4',
-		scale: blues4,
-		rootIntervalToIonian: sumIntervals(0, 3, hexatonicMinorBluesIntervals)
-	},
-	{
-		name: 'Weird 5',
-		scale: blues5,
-		rootIntervalToIonian: sumIntervals(0, 4, hexatonicMinorBluesIntervals)
-	},
-	{
-		name: 'Weird 6',
-		scale: blues6,
-		rootIntervalToIonian: sumIntervals(0, 5, hexatonicMinorBluesIntervals)
 	}
 ];
 
@@ -238,7 +218,7 @@ export const modeGroups = [
 		}
 	},
 	{
-		label: '(Major) Pentatonic',
+		label: 'Pentatonic',
 		modes: majorPentatonicModes,
 		probabilityDistributions: {
 			bass: jamBassProbabilityDistributions.pentatonic,
@@ -246,7 +226,7 @@ export const modeGroups = [
 		}
 	},
 	{
-		label: '(Minor) Blues',
+		label: 'Hexatonic (blues)',
 		modes: minorHexatonicBluesModes,
 		probabilityDistributions: {
 			bass: jamBassProbabilityDistributions.hexatonic,
