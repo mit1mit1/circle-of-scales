@@ -139,7 +139,7 @@
 					fill={highlightedRelativeToRoot[
 						`${getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length)}`
 					] > 0
-						? 'green'
+						? 'blue'
 						: 'var(--base-background-color)'}
 					opacity={highlightedRelativeToRoot[
 						`${getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length)}`
@@ -337,12 +337,8 @@
 						jam(
 							selectedScale.scale,
 							rootNoteIndex,
-							jamMelodyProbabilityDistributions[
-								selectedModesGroup === modeGroups[1] ? 'pentatonic' : 'diatonic'
-							],
-							jamBassProbabilityDistributions[
-								selectedModesGroup === modeGroups[1] ? 'pentatonic' : 'diatonic'
-							],
+							selectedModesGroup.probabilityDistributions.melody,
+							selectedModesGroup.probabilityDistributions.bass,
 							(60 * 1000) / bpm
 						);
 					}}

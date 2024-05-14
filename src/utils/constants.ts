@@ -17,6 +17,7 @@ export const westernChromaticScale: Note[] = [
 
 export const diatonicIntervals = [2, 2, 1, 2, 2, 2, 1];
 export const pentatonicMajorIntervals = [2, 2, 3, 2, 3];
+export const hexatonicMinorBluesIntervals = [3, 2, 1, 1, 3, 2];
 
 export const pythagoreanSemitoneRatios = [
 	1,
@@ -35,12 +36,14 @@ export const pythagoreanSemitoneRatios = [
 
 export const jamMelodyProbabilityDistributions = {
 	pentatonic: [0.3, 0.05, 0.05, 0.2, 0.1],
-	diatonic: [0.3, 0.05, 0.15, 0.05, 0.075, 0.05, 0.03]
+	diatonic: [0.3, 0.05, 0.15, 0.05, 0.075, 0.05, 0.03],
+	hexatonic: [0.3, 0.075, 0.15, 0.075, 0.075, 0.05]
 };
 
 export const jamBassProbabilityDistributions = {
 	pentatonic: [0.5, 0.05, 0.15, 0.2, 0.05],
-	diatonic: [0.5, 0.02, 0.05, 0.1, 0.1, 0.05, 0.02]
+	diatonic: [0.5, 0.02, 0.05, 0.1, 0.1, 0.05, 0.02],
+	hexatonic: [0.5, 0.02, 0.05, 0.1, 0.1, 0.05]
 };
 
 export const MINIMUM_BEAT_DIVISION = 0.25;

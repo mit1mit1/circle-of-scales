@@ -1,6 +1,12 @@
 import type { ChordType, ScaleNote } from '../types';
 import { getPositiveModulo, romanize } from './math';
-import { diatonicIntervals, pentatonicMajorIntervals } from './constants';
+import {
+	diatonicIntervals,
+	hexatonicMinorBluesIntervals,
+	jamBassProbabilityDistributions,
+	jamMelodyProbabilityDistributions,
+	pentatonicMajorIntervals
+} from './constants';
 
 const sumIntervals = (startIndex: number, endIndex: number, intervals: number[]) => {
 	let sum = 0;
@@ -182,13 +188,69 @@ export const majorPentatonicModes = [
 	}
 ];
 
+export const hexatonicMinorBlues = getScale(0, hexatonicMinorBluesIntervals);
+export const hexatonicMajorBlues = getScale(1, hexatonicMinorBluesIntervals);
+export const blues3 = getScale(2, hexatonicMinorBluesIntervals);
+export const blues4 = getScale(3, hexatonicMinorBluesIntervals);
+export const blues5 = getScale(4, hexatonicMinorBluesIntervals);
+export const blues6 = getScale(5, hexatonicMinorBluesIntervals);
+
+export const minorHexatonicBluesModes = [
+	{
+		name: 'Minor',
+		scale: hexatonicMinorBlues,
+		rootIntervalToIonian: sumIntervals(0, 0, hexatonicMinorBluesIntervals)
+	},
+	{
+		name: 'Major',
+		scale: hexatonicMajorBlues,
+		rootIntervalToIonian: sumIntervals(0, 1, hexatonicMinorBluesIntervals)
+	},
+	{
+		name: 'Weird 3',
+		scale: blues3,
+		rootIntervalToIonian: sumIntervals(0, 2, hexatonicMinorBluesIntervals)
+	},
+	{
+		name: 'Weird 4',
+		scale: blues4,
+		rootIntervalToIonian: sumIntervals(0, 3, hexatonicMinorBluesIntervals)
+	},
+	{
+		name: 'Weird 5',
+		scale: blues5,
+		rootIntervalToIonian: sumIntervals(0, 4, hexatonicMinorBluesIntervals)
+	},
+	{
+		name: 'Weird 6',
+		scale: blues6,
+		rootIntervalToIonian: sumIntervals(0, 5, hexatonicMinorBluesIntervals)
+	}
+];
+
 export const modeGroups = [
 	{
 		label: 'Diatonic',
-		modes: diatonicModes
+		modes: diatonicModes,
+		probabilityDistributions: {
+			bass: jamBassProbabilityDistributions.diatonic,
+			melody: jamMelodyProbabilityDistributions.diatonic
+		}
 	},
 	{
 		label: '(Major) Pentatonic',
-		modes: majorPentatonicModes
+		modes: majorPentatonicModes,
+		probabilityDistributions: {
+			bass: jamBassProbabilityDistributions.pentatonic,
+			melody: jamMelodyProbabilityDistributions.pentatonic
+		}
+	},
+	{
+		label: '(Minor) Blues',
+		modes: minorHexatonicBluesModes,
+		probabilityDistributions: {
+			bass: jamBassProbabilityDistributions.hexatonic,
+			melody: jamMelodyProbabilityDistributions.hexatonic
+		}
 	}
 ];
