@@ -200,9 +200,9 @@
 				</div>
 			</div>
 		</div>
+		<FocussedComponentDescription />
 	</div>
 
-	<FocussedComponentDescription />
 </div>
 
 <style>
