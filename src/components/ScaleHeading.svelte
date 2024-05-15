@@ -19,5 +19,7 @@
 		font-family: var(--font-family-standard);
 		text-align: center;
 		line-height: 2em;
+		margin-top: 0.33em;
+		margin-bottom: 0.33em;
 	}
 </style>

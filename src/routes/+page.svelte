@@ -201,7 +201,7 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<FocussedComponentDescription />
 </div>
 
@@ -213,7 +213,8 @@
 		z-index: -2;
 	}
 
-	h2 {
+	:global(h2),
+	:global(h3) {
 		font-family: var(--font-family-standard);
 		font-size: medium;
 	}

@@ -20,9 +20,11 @@
 		{@const allPossibleIntervals = getAllPossibleIntervalLabels(
 			currentFocussedItem.interval.semitonesFromRoot
 		)}
-		{#each allPossibleIntervals as possibleInterval}
-			<div>{getIntervalName(possibleInterval.intervalType, possibleInterval.intervalN)}</div>
-		{/each}
+		<div>
+			{#each allPossibleIntervals as possibleInterval}
+				<span>{getIntervalName(possibleInterval.intervalType, possibleInterval.intervalN)}; </span>
+			{/each}
+		</div>
 	{/if}
 	{#if currentFocussedItem.triad}
 		<h3>Triad:</h3>
