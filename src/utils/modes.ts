@@ -1,12 +1,11 @@
-import type { ChordType, ScaleNote } from '../types';
+import type { ChordType, ScaleNote, Triad } from '../types';
 import { getPositiveModulo, romanize } from './math';
 import {
 	diatonicIntervals,
 	hexatonicMinorBluesIntervals,
 	jamBassProbabilityDistributions,
 	jamMelodyProbabilityDistributions,
-	pentatonicMajorIntervals,
-	westernChromaticScale
+	pentatonicMajorIntervals
 } from './constants';
 
 const sumIntervals = (startIndex: number, endIndex: number, intervals: number[]) => {
@@ -17,17 +16,54 @@ const sumIntervals = (startIndex: number, endIndex: number, intervals: number[])
 	return sum;
 };
 
-const getChordType = (firstInterval: number, secondInterval: number): ChordType => {
-	if (firstInterval === 4 && secondInterval === 7) {
+export const getTriadTypeFromSemitoneGaps = (
+	semitonesFromRootToSecondNote: number,
+	semitonesFromRootToThirdNote: number
+) => {
+	if (semitonesFromRootToSecondNote === 4 && semitonesFromRootToThirdNote === 7) {
 		return 'major';
 	}
-	if (firstInterval === 3 && secondInterval === 7) {
+	if (semitonesFromRootToSecondNote === 3 && semitonesFromRootToThirdNote === 7) {
 		return 'minor';
 	}
-	if (firstInterval === 3 && secondInterval === 6) {
+	if (semitonesFromRootToSecondNote === 3 && semitonesFromRootToThirdNote === 6) {
 		return 'diminished';
 	}
 	return 'bizarre';
+};
+
+export const getTriadTypeFromSelectedScale = (
+	rootNoteIndex: number,
+	scaleNoteIndex: number,
+	selectedScale: ScaleNote[]
+) => {
+	const scaleNotes = [
+		{ ...selectedScale[scaleNoteIndex] },
+		{ ...selectedScale[getPositiveModulo(scaleNoteIndex + 2, selectedScale.length)] },
+		{ ...selectedScale[getPositiveModulo(scaleNoteIndex + 4, selectedScale.length)] }
+	];
+	return getTriadTypeFromSemitoneGaps(
+		scaleNotes[1].semitonesFromRoot,
+		scaleNotes[1].semitonesFromRoot + scaleNotes[2].semitonesFromRoot
+	);
+};
+
+const getTriadTypeFromTriad = (triad: Triad): ChordType => {
+	return getTriadTypeFromSemitoneGaps(
+		triad.firstInterval.semitonesFromRoot,
+		triad.secondInterval.semitonesFromRoot
+	);
+};
+
+export const getTriad = (indexRelativeToIonian: number, intervals: number[]): Triad => {
+	return {
+		firstInterval: {
+			semitonesFromRoot: sumIntervals(indexRelativeToIonian, indexRelativeToIonian + 2, intervals)
+		},
+		secondInterval: {
+			semitonesFromRoot: sumIntervals(indexRelativeToIonian, indexRelativeToIonian + 4, intervals)
+		}
+	};
 };
 
 const getNoteLabel = (
@@ -39,10 +75,7 @@ const getNoteLabel = (
 		getPositiveModulo(indexRelativeToStart + 1, intervals.length + 1)
 	);
 	const indexRelativeToIonian = indexRelativeToStart + startRelativeToIonian;
-	const chordType = getChordType(
-		sumIntervals(indexRelativeToIonian, indexRelativeToIonian + 2, intervals),
-		sumIntervals(indexRelativeToIonian, indexRelativeToIonian + 4, intervals)
-	);
+	const chordType = getTriadTypeFromTriad(getTriad(indexRelativeToIonian, intervals));
 	if (chordType === 'major') {
 		return romanisedIndex;
 	}
@@ -118,7 +151,8 @@ export const getIntervalLabel = (scaleNote: ScaleNote, index: number) => {
 	let testDiatonicIndex = 0;
 
 	while (testDiatonicIndex < diatonicIntervals.length) {
-		const forcedDiatonicDiff = scaleNote.semitonesFromRoot - sumIntervals(0, testDiatonicIndex, diatonicIntervals)
+		const forcedDiatonicDiff =
+			scaleNote.semitonesFromRoot - sumIntervals(0, testDiatonicIndex, diatonicIntervals);
 		const forcedDiatonicIntervalLabel = getDiatonicIntervalLabel(
 			forcedDiatonicDiff,
 			testDiatonicIndex

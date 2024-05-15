@@ -3,9 +3,10 @@ import {
 	pythagoreanSemitoneRatios,
 	westernChromaticScale
 } from './constants';
-import type { InstrumentSettings, Note, ScaleNote } from '../types';
+import type { InstrumentSettings, Interval, Note, ScaleNote } from '../types';
 import { currentlyPlayingRelativeToRoot } from '../store';
 import { getPositiveModulo } from './math';
+import { getTriad, getTriadTypeFromSemitoneGaps } from './modes';
 
 const DEFAULT_BEAT_DURATION = 300;
 const DEFAULT_NOTE_BEATS = 0.75;
@@ -96,7 +97,8 @@ export const playNote = (
 			return {
 				...current,
 				[getPositiveModulo(semitonesFromRoot, westernChromaticScale.length)]:
-					(current[`${semitonesFromRoot}`] ?? 0) + 1
+					(current[`${getPositiveModulo(semitonesFromRoot, westernChromaticScale.length)}`] ?? 0) +
+					1
 			};
 		});
 		oscillator.start();
@@ -105,32 +107,23 @@ export const playNote = (
 			setTimeout(() => {
 				volume.gain.exponentialRampToValueAtTime(MINIMUM_GAIN, context.currentTime + releaseTime);
 				currentlyPlayingRelativeToRoot.update((current) => {
-					const newNumber = Math.max((current[`${semitonesFromRoot}`] ?? 0) - 1, 0);
+					const newNumber = Math.max(
+						(current[`${getPositiveModulo(semitonesFromRoot, westernChromaticScale.length)}`] ??
+							0) - 1,
+						0
+					);
+					console.log(
+						'removing',
+						getPositiveModulo(semitonesFromRoot, westernChromaticScale.length),
+						'from',
+						current,
+						'to give',
+						newNumber
+					);
 					return {
 						...current,
 						[getPositiveModulo(semitonesFromRoot, westernChromaticScale.length)]: newNumber
 					};
-					// const indexOfCurrentNote = current.indexOf(semitonesFromRoot);
-					// console.log(
-					// 	'removing note',
-					// 	semitonesFromRoot,
-					// 	'from',
-					// 	current,
-					// 	'index is',
-					// 	indexOfCurrentNote
-					// );
-					// if (indexOfCurrentNote > -1) {
-					// 	if (current.length === 1) {
-					// 		return [];
-					// 	}
-					// 	// only splice array when item is found
-					// 	console.log('found at', indexOfCurrentNote);
-					// 	return [...current].splice(indexOfCurrentNote, 1);
-
-					// 	// 2nd parameter means remove one item only
-					// }
-					// console.log("WARNING: couldn't find ", semitonesFromRoot, 'in', current);
-					// return current;
 				});
 				setTimeout(function () {
 					oscillator.stop();
@@ -141,8 +134,79 @@ export const playNote = (
 	}, startTimeMilliseconds);
 };
 
+export const playTriad = (
+	rootNoteIndex: number,
+	scaleNoteIndex: number,
+	selectedScale: ScaleNote[],
+	beatDuration = DEFAULT_BEAT_DURATION,
+	noteBeatsLength = DEFAULT_NOTE_BEATS
+) => {
+	const noteDuration = beatDuration * 0.5 * noteBeatsLength;
+	const noteGap = beatDuration * 0.5 - noteDuration;
+	const noteLength = beatDuration * 0.5;
+	const scaleNotes = [
+		{ ...selectedScale[scaleNoteIndex] },
+		{ ...selectedScale[getPositiveModulo(scaleNoteIndex + 2, selectedScale.length)] },
+		{ ...selectedScale[getPositiveModulo(scaleNoteIndex + 4, selectedScale.length)] }
+	];
+
+	scaleNotes.forEach((scaleNote, index) => {
+		if (index <= 0) {
+			return;
+		}
+		console.log(
+			scaleNote.semitonesFromRoot < scaleNotes[index - 1].semitonesFromRoot,
+			scaleNote.semitonesFromRoot,
+			scaleNotes[index - 1].semitonesFromRoot
+		);
+		if (scaleNote.semitonesFromRoot < scaleNotes[index - 1].semitonesFromRoot) {
+			scaleNote.semitonesFromRoot += westernChromaticScale.length;
+		}
+		return;
+	});
+
+	console.log('mapped scale notes', scaleNotes);
+
+	[...scaleNotes].forEach((scaleNote, index) => {
+		playNote(
+			westernChromaticScale[rootNoteIndex],
+			scaleNote.semitonesFromRoot,
+			index * noteLength + noteGap,
+			index * noteLength + noteGap + noteDuration + noteLength
+		);
+	});
+	[...scaleNotes].forEach((scaleNote) => {
+		playNote(
+			westernChromaticScale[rootNoteIndex],
+			scaleNote.semitonesFromRoot,
+			(scaleNotes.length + 1) * noteLength + noteGap,
+			(scaleNotes.length + 1) * noteLength + noteGap + (noteDuration + noteLength) * 2
+		);
+	});
+};
+
+export const playInterval = (
+	scaleNote: Interval,
+	rootNoteIndex: number,
+	beatDuration = DEFAULT_BEAT_DURATION,
+	noteBeatsLength = DEFAULT_NOTE_BEATS
+) => {
+	const noteDuration = beatDuration * 0.5 * noteBeatsLength;
+	const noteGap = beatDuration * 0.5 - noteDuration;
+	const noteLength = beatDuration * 0.5;
+	const scaleNotes = [{ semitonesFromRoot: 0 }, scaleNote];
+	[...scaleNotes].forEach((scaleNote, index) => {
+		playNote(
+			westernChromaticScale[rootNoteIndex],
+			scaleNote.semitonesFromRoot,
+			index * noteLength + noteGap,
+			index * noteLength + noteGap + noteDuration + noteLength
+		);
+	});
+};
+
 export const playScalePedal = (
-	scaleNotes: ScaleNote[],
+	scaleNotes: Interval[],
 	rootNoteIndex: number,
 	beatDuration = DEFAULT_BEAT_DURATION,
 	noteBeatsLength = DEFAULT_NOTE_BEATS
@@ -194,7 +258,7 @@ export const playScalePedal = (
 };
 
 export const playScaleUpDown = (
-	scaleNotes: ScaleNote[],
+	scaleNotes: Interval[],
 	rootNoteIndex: number,
 	beatDuration = DEFAULT_BEAT_DURATION,
 	noteBeatsLength = DEFAULT_NOTE_BEATS
@@ -236,7 +300,7 @@ export const playScaleUpDown = (
 };
 
 export const playScaleDrone = (
-	scaleNotes: ScaleNote[],
+	scaleNotes: Interval[],
 	rootNoteIndex: number,
 	beatDuration = DEFAULT_BEAT_DURATION,
 	noteBeatsLength = DEFAULT_NOTE_BEATS
@@ -283,7 +347,7 @@ export const playScaleDrone = (
 };
 
 export const jam = (
-	scaleNotes: ScaleNote[],
+	scaleNotes: Interval[],
 	rootNoteIndex: number,
 	melodyProbabilities: number[],
 	bassProbabilities: number[],

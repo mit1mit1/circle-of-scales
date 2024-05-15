@@ -1,9 +1,17 @@
 <script setup lang="ts">
-	import { modeGroups, getIntervalLabel } from '../utils/modes';
+	import { modeGroups, getIntervalLabel, getTriadTypeFromSelectedScale } from '../utils/modes';
 	import type { Circle, Note, ScaleNote } from '../types';
 	import { getPositiveModulo } from '../utils/math';
 	import { westernChromaticScale } from '../utils/constants';
-	import { playScaleUpDown, playScalePedal, playScaleDrone, jam } from '../utils/sounds';
+	import {
+		playScaleUpDown,
+		playScalePedal,
+		playScaleDrone,
+		jam,
+		playNote,
+		playInterval,
+		playTriad
+	} from '../utils/sounds';
 	import { currentlyPlayingRelativeToRoot } from '../store';
 
 	const visibleCircle: Circle = {
@@ -112,54 +120,14 @@
 			fill="var(--base-background-color)"
 			class="background"
 		/>
-		{#each [...westernChromaticScale] as note, index}
-			{@const notePosition = getNotePosition(index, notePositionCircle)}
-			<g>
-				<circle
-					style="stroke-width:1.6871;stroke-miterlimit:10;"
-					cx={0}
-					cy={0}
-					r={30}
-					transform={`translate(${notePosition.x} ${notePosition.y})`}
-					stroke="transparent"
-					fill={index === rootNoteIndex ? 'yellow' : 'var(--base-background-color)'}
-				/>
-				<circle
-					style="stroke-width:1.6871;stroke-miterlimit:10;"
-					cx={0}
-					cy={0}
-					r={30}
-					transform={`translate(${notePosition.x} ${notePosition.y})`}
-					stroke="transparent"
-					fill={highlightedRelativeToRoot[
-						`${getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length)}`
-					] > 0
-						? 'blue'
-						: 'var(--base-background-color)'}
-					opacity={highlightedRelativeToRoot[
-						`${getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length)}`
-					] > 0
-						? '0.5'
-						: '0'}
-					class="transitionAllQuick"
-				/>
-				<text
-					x={notePosition.x}
-					y={notePosition.y}
-					class={`svgNoteName ${
-						isInScale(index, rootNoteIndex, selectedScale.scale) ? 'svgSelectedNoteName' : ''
-					}`}
-					text-anchor="middle"
-					dy=".3em">{getNoteString(note)}</text
-				>
-			</g>
-		{/each}
-		{#each [...selectedScale.scale] as scaleNote, index}
+
+		{#each [...selectedScale.scale] as scaleNote, scaleNoteIndex}
 			{@const notePosition = isEquivalentModing
 				? getNotePosition(
 						selectedScale.scale[
 							getPositiveModulo(
-								index - selectedModesGroup.modes.findIndex((scale) => scale === selectedScale),
+								scaleNoteIndex -
+									selectedModesGroup.modes.findIndex((scale) => scale === selectedScale),
 								selectedScale.scale.length
 							)
 						].semitonesFromRoot + rootNoteIndex,
@@ -187,22 +155,137 @@
 				class="transitionAll"
 			/>
 			<g class="transitionNote">
+				<g
+					class="clickable"
+					on:click={() =>
+						playTriad(rootNoteIndex, scaleNoteIndex, selectedScale.scale, (60 * 1000) / bpm)}
+					on:keydown={(e) =>
+						e.key === 'Enter' && playTriad(rootNoteIndex, scaleNoteIndex, selectedScale.scale, (60 * 1000) / bpm)}
+					tabindex="0"
+					aria-label={`Play ${
+						westernChromaticScale[
+							getPositiveModulo(
+								rootNoteIndex + scaleNote.semitonesFromRoot,
+								westernChromaticScale.length
+							)
+						]
+					} ${getTriadTypeFromSelectedScale(
+						rootNoteIndex,
+						scaleNoteIndex,
+						selectedScale.scale
+					)} triad`}
+					role="button"
+				>
+					<circle
+						style="stroke-width:1.6871;stroke-miterlimit:10;"
+						cx={0}
+						cy={0}
+						r={30}
+						transform={`translate(${scaleNotePosition.x} ${scaleNotePosition.y})`}
+						stroke="transparent"
+						fill={'transparent'}
+					/>
+					<text
+						x={0}
+						y={0}
+						text-anchor="middle"
+						dy=".3em"
+						transform={`translate(${scaleNotePosition.x} ${scaleNotePosition.y})`}
+						class="svgNoteName scaleNote transitionAll"
+					>
+						{scaleNote.label}
+					</text>
+				</g>
+				<g
+					class="clickable"
+					on:click={() => playInterval(scaleNote, rootNoteIndex, (60 * 1000) / bpm)}
+					on:keydown={(e) => e.key === 'Enter' && playInterval(scaleNote, rootNoteIndex, (60 * 1000) / bpm)}
+					tabindex="0"
+					aria-label={`Play ${getIntervalLabel(scaleNote, scaleNoteIndex)} interval`}
+					role="button"
+				>
+					<circle
+						style="stroke-width:1.6871;stroke-miterlimit:10;"
+						cx={0}
+						cy={0}
+						r={30}
+						transform={`translate(${intervalPosition.x} ${intervalPosition.y})`}
+						stroke="transparent"
+						fill={'transparent'}
+					/>
+					<text
+						x={0}
+						y={0}
+						text-anchor="middle"
+						dy=".3em"
+						transform={`translate(${intervalPosition.x} ${intervalPosition.y})`}
+						class="svgNoteName scaleNote transitionAll"
+					>
+						{getIntervalLabel(scaleNote, scaleNoteIndex)}
+					</text>
+				</g>
+			</g>
+		{/each}
+		{#each [...westernChromaticScale] as note, index}
+			{@const notePosition = getNotePosition(index, notePositionCircle)}
+			<g
+				class="clickable"
+				on:click={() =>
+					playNote(
+						westernChromaticScale[rootNoteIndex],
+						getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length),
+						0,
+						500
+					)}
+				on:keydown={(e) =>
+					e.key === 'Enter' &&
+					playNote(
+						westernChromaticScale[rootNoteIndex],
+						getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length),
+						0,
+						500
+					)}
+				tabindex="0"
+				aria-label={`Play ${getNoteString(note)}`}
+				role="button"
+			>
+				<circle
+					style="stroke-width:1.6871;stroke-miterlimit:10;"
+					cx={0}
+					cy={0}
+					r={30}
+					transform={`translate(${notePosition.x} ${notePosition.y})`}
+					stroke="transparent"
+					fill={index === rootNoteIndex ? 'yellow' : 'var(--base-background-color)'}
+				/>
+				<circle
+					style="stroke-width:1.6871;stroke-miterlimit:10;"
+					cx={0}
+					cy={0}
+					r={30}
+					transform={`translate(${notePosition.x} ${notePosition.y})`}
+					stroke="transparent"
+					fill={highlightedRelativeToRoot[
+						`${getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length)}`
+					] > 0
+						? 'blue'
+						: 'var(--base-background-color)'}
+					opacity={(highlightedRelativeToRoot[
+						`${getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length)}`
+					] ?? 0) / 3}
+					class="transitionAllQuick"
+				/>
 				<text
-					x={0}
-					y={0}
+					x={notePosition.x}
+					y={notePosition.y}
+					class={`svgNoteName ${
+						isInScale(index, rootNoteIndex, selectedScale.scale) ? 'svgSelectedNoteName' : ''
+					}`}
 					text-anchor="middle"
 					dy=".3em"
-					transform={`translate(${scaleNotePosition.x} ${scaleNotePosition.y})`}
-					class="svgNoteName scaleNote transitionAll">{scaleNote.label}</text
 				>
-				<text
-					x={0}
-					y={0}
-					text-anchor="middle"
-					dy=".3em"
-					transform={`translate(${intervalPosition.x} ${intervalPosition.y})`}
-					class="svgNoteName scaleNote transitionAll">{getIntervalLabel(scaleNote, index)}</text
-				>
+					{getNoteString(note)}
+				</text>
 			</g>
 		{/each}
 	</svg>
@@ -498,5 +581,9 @@
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: space-evenly;
+	}
+
+	.clickable {
+		cursor: pointer;
 	}
 </style>

@@ -5,9 +5,18 @@ export interface Note {
 	defaultOctaveFrequency: number;
 }
 
+export interface Interval {
+	semitonesFromRoot: number;
+}
+
 export interface ScaleNote {
 	semitonesFromRoot: number;
 	label: string;
+}
+
+export interface Triad {
+	firstInterval: Interval,
+	secondInterval: Interval,
 }
 
 export type ChordType = 'major' | 'minor' | 'diminished' | 'bizarre';
