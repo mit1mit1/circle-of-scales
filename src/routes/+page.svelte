@@ -4,18 +4,11 @@
 	import type { Circle, Note, ScaleNote } from '../types';
 	import { getPositiveModulo } from '../utils/math';
 	import { westernChromaticScale } from '../utils/constants';
-	import {
-		playScaleUpDown,
-		playScalePedal,
-		playScaleDrone,
-		jam,
-		playNote,
-		playInterval,
-		playTriad
-	} from '../utils/sounds';
+	import { playNote, playInterval, playTriad } from '../utils/sounds';
 	import { currentlyPlayingRelativeToRoot } from '../store';
 	import ScaleHeading from '../components/ScaleHeading.svelte';
-	import { getNoteString } from '../utils/basicMusicTheory';
+	import { getNoteString, isInScale } from '../utils/basicMusicTheory';
+	import MusicPlayers from '../components/MusicPlayers.svelte';
 
 	const visibleCircle: Circle = {
 		xCentre: 400,
@@ -83,17 +76,6 @@
 							0.5 * Math.PI
 					)
 		};
-	};
-
-	const isInScale = (noteIndex: number, rootNoteIndex: number, scale: ScaleNote[]) => {
-		let semitonesFromRoot = getPositiveModulo(
-			noteIndex - rootNoteIndex,
-			westernChromaticScale.length
-		);
-		if (semitonesFromRoot < 0) {
-			semitonesFromRoot = semitonesFromRoot + westernChromaticScale.length;
-		}
-		return scale.some((scaleNote) => scaleNote.semitonesFromRoot === semitonesFromRoot);
 	};
 
 	let bpm = 70;
@@ -377,42 +359,12 @@
 			</div>
 		</div>
 		<div class="musicControls">
-			<div>
-				<button
-					on:click={() => {
-						playScaleUpDown(selectedScale.scale, rootNoteIndex, (60 * 1000) / bpm);
-					}}
-				>
-					▶ Scale
-				</button>
-				<button
-					on:click={() => {
-						playScalePedal(selectedScale.scale, rootNoteIndex, (60 * 1000) / bpm);
-					}}
-				>
-					▶ Scale + Pedal
-				</button>
-				<button
-					on:click={() => {
-						playScaleDrone(selectedScale.scale, rootNoteIndex, (60 * 1000) / bpm);
-					}}
-				>
-					▶ Scale + Drone
-				</button>
-				<button
-					on:click={() => {
-						jam(
-							selectedScale.scale,
-							rootNoteIndex,
-							selectedModesGroup.probabilityDistributions.melody,
-							selectedModesGroup.probabilityDistributions.bass,
-							(60 * 1000) / bpm
-						);
-					}}
-				>
-					▶ Jam
-				</button>
-			</div>
+			<MusicPlayers
+				{bpm}
+				{rootNoteIndex}
+				{selectedModesGroup}
+				selectedScaleNotes={selectedScale.scale}
+			/>
 		</div>
 		<div class="musicControls">
 			<div>
@@ -465,7 +417,7 @@
 		text-align: center;
 	}
 
-	button {
+	:global(button) {
 		margin-bottom: 5px;
 		margin-right: 5px;
 		transition-duration: 0.4s;
@@ -485,11 +437,11 @@
 		background-color: var(--button-background-color);
 	}
 
-	button:hover:not(.selectedTab) {
+	:global(button):hover:not(.selectedTab) {
 		background-color: var(--button-hover-background-color);
 	}
 
-	button.selectedTab {
+	:global(button).selectedTab {
 		background-color: var(--button-selected-background-color);
 	}
 
