@@ -14,6 +14,8 @@
 		playTriad
 	} from '../utils/sounds';
 	import { currentlyPlayingRelativeToRoot } from '../store';
+	import ScaleHeading from '../components/ScaleHeading.svelte';
+	import { getNoteString } from '../utils/basicMusicTheory';
 
 	const visibleCircle: Circle = {
 		xCentre: 400,
@@ -48,13 +50,6 @@
 
 	let selectedModesGroup = modeGroups[0];
 	let selectedScale = selectedModesGroup.modes[0];
-
-	const getNoteString = (note: Note) => {
-		if (note.preferSharp) {
-			return note.sharpNote;
-		}
-		return note.flatNote;
-	};
 
 	const getNotePosition = (noteIndex: number, circle: Circle) => {
 		return {
@@ -104,12 +99,7 @@
 	let bpm = 70;
 </script>
 
-<h1>
-	{getNoteString(
-		westernChromaticScale[getPositiveModulo(rootNoteIndex, westernChromaticScale.length)]
-	)}
-	{selectedScale.name}
-</h1>
+<ScaleHeading {rootNoteIndex} selectedScaleName={selectedScale.name} />
 <div class="appContainer" data-sveltekit-preload-data="hover">
 	<svg id="boxOfNotes" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
 		<circle
@@ -462,12 +452,6 @@
 
 	.midground {
 		z-index: -1;
-	}
-
-	h1 {
-		font-family: var(--font-family-standard);
-		text-align: center;
-		line-height: 2em;
 	}
 
 	h2 {

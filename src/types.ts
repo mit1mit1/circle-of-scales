@@ -15,8 +15,8 @@ export interface ScaleNote {
 }
 
 export interface Triad {
-	firstInterval: Interval,
-	secondInterval: Interval,
+	firstInterval: Interval;
+	secondInterval: Interval;
 }
 
 export type TriadType = 'major' | 'minor' | 'diminished' | 'bizarre';
@@ -37,4 +37,19 @@ export type InstrumentSettings = {
 	releaseTime: number;
 	maxGain: number;
 	oscillatorType: SynthType;
+};
+
+export type Scale = {
+	name: string;
+	scale: ScaleNote[];
+	rootIntervalToIonian: number;
+};
+
+export type ModeGroup = {
+	label: string;
+	modes: Scale[];
+	probabilityDistributions: {
+		bass: number[];
+		melody: number[];
+	};
 };

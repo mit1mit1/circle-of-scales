@@ -1,4 +1,4 @@
-import type { ScaleNote } from '../types';
+import type { ModeGroup, Scale, ScaleNote } from '../types';
 import { getPositiveModulo, romanize, sumIntervals } from './math';
 import {
 	diatonicIntervals,
@@ -118,7 +118,7 @@ export const mixolydianScale = getScale(4, diatonicIntervals);
 export const aeolianScale = getScale(5, diatonicIntervals);
 export const locrianScale = getScale(6, diatonicIntervals);
 
-export const diatonicModes = [
+export const diatonicModes: Scale[] = [
 	{
 		name: 'Ionian / Major',
 		scale: ionianScale,
@@ -210,7 +210,7 @@ export const minorHexatonicBluesModes = [
 	}
 ];
 
-export const modeGroups = [
+export const modeGroups: ModeGroup[] = [
 	{
 		label: 'Diatonic',
 		modes: diatonicModes,
