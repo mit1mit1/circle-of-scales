@@ -5,22 +5,17 @@
 	import { getPositiveModulo } from '../utils/math';
 	import { westernChromaticScale } from '../utils/constants';
 	import { playNote, playInterval, playTriad } from '../utils/sounds';
-	import { currentlyPlayingRelativeToRoot } from '../store';
 	import ScaleHeading from '../components/ScaleHeading.svelte';
 	import { getNoteString, isInScale } from '../utils/basicMusicTheory';
 	import MusicPlayers from '../components/MusicPlayers.svelte';
+	import { getNotePosition, getScaleNotePosition } from '../utils/svgLayout';
+	import WesternChromaticCircle from '../components/WesternChromaticCircle.svelte';
 
 	const visibleCircle: Circle = {
 		xCentre: 400,
 		yCentre: 400,
 		radius: 300
 	};
-
-	let highlightedRelativeToRoot: Record<string, number> = {};
-
-	currentlyPlayingRelativeToRoot.subscribe((newPlayingNotes) => {
-		highlightedRelativeToRoot = newPlayingNotes;
-	});
 
 	let isEquivalentModing = true;
 
@@ -43,40 +38,6 @@
 
 	let selectedModesGroup = modeGroups[0];
 	let selectedScale = selectedModesGroup.modes[0];
-
-	const getNotePosition = (noteIndex: number, circle: Circle) => {
-		return {
-			x:
-				circle.xCentre +
-				circle.radius *
-					Math.cos((noteIndex * 2 * Math.PI) / westernChromaticScale.length - 0.5 * Math.PI),
-			y:
-				circle.yCentre +
-				circle.radius *
-					Math.sin((noteIndex * 2 * Math.PI) / westernChromaticScale.length - 0.5 * Math.PI)
-		};
-	};
-
-	const getScaleNotePosition = (scaleNote: ScaleNote, rootIndex: number, circle: Circle) => {
-		return {
-			x:
-				circle.xCentre +
-				circle.radius *
-					Math.cos(
-						((scaleNote.semitonesFromRoot + rootIndex) * 2 * Math.PI) /
-							westernChromaticScale.length -
-							0.5 * Math.PI
-					),
-			y:
-				circle.yCentre +
-				circle.radius *
-					Math.sin(
-						((scaleNote.semitonesFromRoot + rootIndex) * 2 * Math.PI) /
-							westernChromaticScale.length -
-							0.5 * Math.PI
-					)
-		};
-	};
 
 	let bpm = 70;
 </script>
@@ -197,68 +158,11 @@
 				</g>
 			</g>
 		{/each}
-		{#each [...westernChromaticScale] as note, index}
-			{@const notePosition = getNotePosition(index, notePositionCircle)}
-			<g
-				class="clickable"
-				on:click={() =>
-					playNote(
-						westernChromaticScale[rootNoteIndex],
-						getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length),
-						0,
-						500
-					)}
-				on:keydown={(e) =>
-					e.key === 'Enter' &&
-					playNote(
-						westernChromaticScale[rootNoteIndex],
-						getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length),
-						0,
-						500
-					)}
-				tabindex="0"
-				aria-label={`Play ${getNoteString(note)}`}
-				role="button"
-			>
-				<circle
-					style="stroke-width:1.6871;stroke-miterlimit:10;"
-					cx={0}
-					cy={0}
-					r={30}
-					transform={`translate(${notePosition.x} ${notePosition.y})`}
-					stroke="transparent"
-					fill={index === rootNoteIndex ? 'yellow' : 'var(--base-background-color)'}
-				/>
-				<circle
-					style="stroke-width:1.6871;stroke-miterlimit:10;"
-					cx={0}
-					cy={0}
-					r={30}
-					transform={`translate(${notePosition.x} ${notePosition.y})`}
-					stroke="transparent"
-					fill={highlightedRelativeToRoot[
-						`${getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length)}`
-					] > 0
-						? 'blue'
-						: 'var(--base-background-color)'}
-					opacity={(highlightedRelativeToRoot[
-						`${getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length)}`
-					] ?? 0) / 3}
-					class="transitionAllQuick"
-				/>
-				<text
-					x={notePosition.x}
-					y={notePosition.y}
-					class={`svgNoteName ${
-						isInScale(index, rootNoteIndex, selectedScale.scale) ? 'svgSelectedNoteName' : ''
-					}`}
-					text-anchor="middle"
-					dy=".3em"
-				>
-					{getNoteString(note)}
-				</text>
-			</g>
-		{/each}
+		<WesternChromaticCircle
+			{notePositionCircle}
+			{rootNoteIndex}
+			selectedScaleNotes={selectedScale.scale}
+		/>
 	</svg>
 	<div class="boxOfButtons">
 		<div>
@@ -402,10 +306,6 @@
 		z-index: -2;
 	}
 
-	.midground {
-		z-index: -1;
-	}
-
 	h2 {
 		font-family: var(--font-family-standard);
 		font-size: medium;
@@ -464,21 +364,10 @@
 		max-width: 500px;
 	}
 
-	.svgNoteName {
+	:global(.svgNoteName) {
 		font: 30px sans-serif;
 	}
 
-	.svgSelectedNoteName {
-		font-weight: bold;
-
-		-moz-border-radius: 30px; /* or 50% */
-		border-radius: 30px; /* or 50% */
-
-		background-color: black;
-		color: white;
-		text-align: center;
-		font-size: 2em;
-	}
 
 	.scaleNote {
 		font-weight: bold;
@@ -496,18 +385,6 @@
 		transition: all 500ms ease-in-out;
 	}
 
-	.transitionAllQuick {
-		-webkit-transition: all 60ms ease-out;
-		-moz-transition: all 60ms ease-out;
-		-ms-transition: all 60ms ease-out;
-		-o-transition: all 60ms ease-out;
-		transition: all 60ms ease-out;
-	}
-
-	.transitionAll.hidden {
-		opacity: 0;
-	}
-
 	.musicControls {
 		margin-top: 20px;
 	}
@@ -518,7 +395,7 @@
 		justify-content: space-evenly;
 	}
 
-	.clickable {
+	:global(.clickable) {
 		cursor: pointer;
 	}
 </style>
