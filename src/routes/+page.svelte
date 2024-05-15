@@ -209,6 +209,10 @@
 	@import '../themes/light.css';
 	@import '../themes/global.css';
 
+	#boxOfNotes {
+		overflow: visible;
+	}
+
 	.background {
 		z-index: -2;
 	}
