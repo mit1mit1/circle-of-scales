@@ -6,6 +6,7 @@ import {
 import type { InstrumentSettings, Interval, Note, ScaleNote } from '../types';
 import { currentlyPlayingRelativeToRoot } from '../store';
 import { getPositiveModulo } from './math';
+import { getTriadScaleNotes } from './triads';
 
 const DEFAULT_BEAT_DURATION = 300;
 const DEFAULT_NOTE_BEATS = 0.75;
@@ -135,30 +136,11 @@ export const playTriad = (
 	const noteDuration = beatDuration * 0.5 * noteBeatsLength;
 	const noteGap = beatDuration * 0.5 - noteDuration;
 	const noteLength = beatDuration * 0.5;
-	const scaleNotes = [
-		{ ...selectedScale[scaleNoteIndex] },
-		{ ...selectedScale[getPositiveModulo(scaleNoteIndex + 2, selectedScale.length)] },
-		{ ...selectedScale[getPositiveModulo(scaleNoteIndex + 4, selectedScale.length)] }
-	];
 
-	scaleNotes.forEach((scaleNote, index) => {
-		if (index <= 0) {
-			return;
-		}
-		console.log(
-			scaleNote.semitonesFromRoot < scaleNotes[index - 1].semitonesFromRoot,
-			scaleNote.semitonesFromRoot,
-			scaleNotes[index - 1].semitonesFromRoot
-		);
-		if (scaleNote.semitonesFromRoot < scaleNotes[index - 1].semitonesFromRoot) {
-			scaleNote.semitonesFromRoot += westernChromaticScale.length;
-		}
-		return;
-	});
+	const triadNotes = getTriadScaleNotes(scaleNoteIndex, selectedScale);
+	console.log('mapped scale notes', triadNotes);
 
-	console.log('mapped scale notes', scaleNotes);
-
-	[...scaleNotes].forEach((scaleNote, index) => {
+	[...triadNotes].forEach((scaleNote, index) => {
 		playNote(
 			westernChromaticScale[rootNoteIndex],
 			scaleNote.semitonesFromRoot,
@@ -166,12 +148,12 @@ export const playTriad = (
 			index * noteLength + noteGap + noteDuration + noteLength
 		);
 	});
-	[...scaleNotes].forEach((scaleNote) => {
+	[...triadNotes].forEach((scaleNote) => {
 		playNote(
 			westernChromaticScale[rootNoteIndex],
 			scaleNote.semitonesFromRoot,
-			(scaleNotes.length + 1) * noteLength + noteGap,
-			(scaleNotes.length + 1) * noteLength + noteGap + (noteDuration + noteLength) * 2
+			(triadNotes.length + 1) * noteLength + noteGap,
+			(triadNotes.length + 1) * noteLength + noteGap + (noteDuration + noteLength) * 2
 		);
 	});
 };

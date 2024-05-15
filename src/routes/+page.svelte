@@ -201,8 +201,9 @@
 			</div>
 		</div>
 	</div>
+	
+	<FocussedComponentDescription />
 </div>
-<FocussedComponentDescription />
 
 <style>
 	@import '../themes/light.css';

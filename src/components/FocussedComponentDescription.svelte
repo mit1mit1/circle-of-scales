@@ -1,18 +1,22 @@
 <script setup lang="ts">
 	import { lastFocussedItems } from '../store';
 	import type { LastFocussedItems } from '../types';
-	import { getAllPossibleIntervalLabels, getIntervalLabelString, getIntervalName } from '../utils/basicMusicTheory';
+	import {
+		getAllPossibleIntervalLabels,
+		getIntervalName,
+		getNoteString
+	} from '../utils/basicMusicTheory';
+	import { getTriadTypeFromTriad } from '../utils/triads';
 	let currentFocussedItem: LastFocussedItems = {};
 
 	lastFocussedItems.subscribe((newFocussedItems) => {
-		console.log('new focussed items woo');
 		currentFocussedItem = { ...newFocussedItems };
 	});
 </script>
 
-<div>
+<div class="focussedItemDetails">
 	{#if currentFocussedItem.interval}
-		Equivalent intervals:
+		<h3>Equivalent intervals:</h3>
 		{@const allPossibleIntervals = getAllPossibleIntervalLabels(
 			currentFocussedItem.interval.semitonesFromRoot
 		)}
@@ -20,4 +24,18 @@
 			<div>{getIntervalName(possibleInterval.intervalType, possibleInterval.intervalN)}</div>
 		{/each}
 	{/if}
+	{#if currentFocussedItem.triad}
+		<h3>Triad:</h3>
+		<div>
+			{getNoteString(currentFocussedItem.triad.rootNote)}
+			{getTriadTypeFromTriad(currentFocussedItem.triad)}
+		</div>
+	{/if}
 </div>
+
+<style>
+	.focussedItemDetails {
+		min-width: 500px;
+		margin-bottom: 20px;
+	}
+</style>

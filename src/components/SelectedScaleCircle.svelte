@@ -4,7 +4,7 @@
 	import { getIntervalLabel } from '../utils/basicMusicTheory';
 	import { playTriad, playInterval } from '../utils/sounds';
 	import { getNotePosition, getScaleNotePosition } from '../utils/svgLayout';
-	import { getTriadTypeFromSelectedScale } from '../utils/triads';
+	import { getTriad, getTriadScaleNotes, getTriadTypeFromSelectedScale } from '../utils/triads';
 	import type { Circle, Scale, ScaleNote } from '../types';
 	import { lastFocussedItems } from '../store';
 
@@ -20,10 +20,34 @@
 	const handleSelectInterval = (scaleNote: ScaleNote) => {
 		playInterval(scaleNote, rootNoteIndex, (60 * 1000) / bpm);
 		lastFocussedItems.update((focussedItems) => {
-			console.log('setting focussed Items', focussedItems, 'with', scaleNote);
 			return {
-				...focussedItems,
 				interval: scaleNote
+			};
+		});
+	};
+
+	const handleSelectTriad = (scaleNoteIndex: number) => {
+		playTriad(rootNoteIndex, scaleNoteIndex, selectedScale.scale, (60 * 1000) / bpm);
+		lastFocussedItems.update((focussedItems) => {
+			const triadScaleNotes = getTriadScaleNotes(scaleNoteIndex, selectedScale.scale);
+			return {
+				triad: {
+					rootNote:
+						westernChromaticScale[
+							getPositiveModulo(
+								rootNoteIndex + selectedScale.scale[scaleNoteIndex].semitonesFromRoot,
+								westernChromaticScale.length
+							)
+						],
+					firstInterval: {
+						semitonesFromRoot:
+							triadScaleNotes[1].semitonesFromRoot - triadScaleNotes[0].semitonesFromRoot
+					},
+					secondInterval: {
+						semitonesFromRoot:
+							triadScaleNotes[2].semitonesFromRoot - triadScaleNotes[0].semitonesFromRoot
+					}
+				}
 			};
 		});
 	};
@@ -60,11 +84,8 @@
 	<g class="transitionNote">
 		<g
 			class="clickable"
-			on:click={() =>
-				playTriad(rootNoteIndex, scaleNoteIndex, selectedScale.scale, (60 * 1000) / bpm)}
-			on:keydown={(e) =>
-				e.key === 'Enter' &&
-				playTriad(rootNoteIndex, scaleNoteIndex, selectedScale.scale, (60 * 1000) / bpm)}
+			on:click={() => handleSelectTriad(scaleNoteIndex)}
+			on:keydown={(e) => e.key === 'Enter' && handleSelectTriad(scaleNoteIndex)}
 			tabindex="0"
 			aria-label={`Play ${
 				westernChromaticScale[
