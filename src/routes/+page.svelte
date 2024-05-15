@@ -10,6 +10,7 @@
 	import MusicPlayers from '../components/MusicPlayers.svelte';
 	import { getNotePosition, getScaleNotePosition } from '../utils/svgLayout';
 	import WesternChromaticCircle from '../components/WesternChromaticCircle.svelte';
+	import SelectedScaleCircle from '../components/SelectedScaleCircle.svelte';
 
 	const visibleCircle: Circle = {
 		xCentre: 400,
@@ -54,110 +55,16 @@
 			fill="var(--base-background-color)"
 			class="background"
 		/>
-
-		{#each [...selectedScale.scale] as scaleNote, scaleNoteIndex}
-			{@const notePosition = isEquivalentModing
-				? getNotePosition(
-						selectedScale.scale[
-							getPositiveModulo(
-								scaleNoteIndex -
-									selectedModesGroup.modes.findIndex((scale) => scale === selectedScale),
-								selectedScale.scale.length
-							)
-						].semitonesFromRoot + rootNoteIndex,
-						notePositionCircle
-				  )
-				: getNotePosition(scaleNote.semitonesFromRoot + rootNoteIndex, notePositionCircle)}
-			{@const scaleNotePosition = getScaleNotePosition(
-				scaleNote,
-				rootNoteIndex,
-				scaleNotePositionCircle
-			)}
-			{@const intervalPosition = getScaleNotePosition(
-				scaleNote,
-				rootNoteIndex,
-				intervalPositionCircle
-			)}
-			<circle
-				style="stroke-width:1.6871;stroke-miterlimit:10;"
-				cx={0}
-				cy={0}
-				r={30}
-				transform={`translate(${notePosition.x} ${notePosition.y})`}
-				stroke="black"
-				fill="transparent"
-				class="transitionAll"
-			/>
-			<g class="transitionNote">
-				<g
-					class="clickable"
-					on:click={() =>
-						playTriad(rootNoteIndex, scaleNoteIndex, selectedScale.scale, (60 * 1000) / bpm)}
-					on:keydown={(e) =>
-						e.key === 'Enter' &&
-						playTriad(rootNoteIndex, scaleNoteIndex, selectedScale.scale, (60 * 1000) / bpm)}
-					tabindex="0"
-					aria-label={`Play ${
-						westernChromaticScale[
-							getPositiveModulo(
-								rootNoteIndex + scaleNote.semitonesFromRoot,
-								westernChromaticScale.length
-							)
-						]
-					} ${getTriadTypeFromSelectedScale(scaleNoteIndex, selectedScale.scale)} triad`}
-					role="button"
-				>
-					<circle
-						style="stroke-width:1.6871;stroke-miterlimit:10;"
-						cx={0}
-						cy={0}
-						r={30}
-						transform={`translate(${scaleNotePosition.x} ${scaleNotePosition.y})`}
-						stroke="transparent"
-						fill={'transparent'}
-					/>
-					<text
-						x={0}
-						y={0}
-						text-anchor="middle"
-						dy=".3em"
-						transform={`translate(${scaleNotePosition.x} ${scaleNotePosition.y})`}
-						class="svgNoteName scaleNote transitionAll"
-					>
-						{scaleNote.label}
-					</text>
-				</g>
-				<g
-					class="clickable"
-					on:click={() => playInterval(scaleNote, rootNoteIndex, (60 * 1000) / bpm)}
-					on:keydown={(e) =>
-						e.key === 'Enter' && playInterval(scaleNote, rootNoteIndex, (60 * 1000) / bpm)}
-					tabindex="0"
-					aria-label={`Play ${getIntervalLabel(scaleNote, scaleNoteIndex)} interval`}
-					role="button"
-				>
-					<circle
-						style="stroke-width:1.6871;stroke-miterlimit:10;"
-						cx={0}
-						cy={0}
-						r={30}
-						transform={`translate(${intervalPosition.x} ${intervalPosition.y})`}
-						stroke="transparent"
-						fill={'transparent'}
-					/>
-					<text
-						x={0}
-						y={0}
-						text-anchor="middle"
-						dy=".3em"
-						transform={`translate(${intervalPosition.x} ${intervalPosition.y})`}
-						class="svgNoteName scaleNote transitionAll"
-					>
-						{getIntervalLabel(scaleNote, scaleNoteIndex)}
-					</text>
-				</g>
-			</g>
-		{/each}
+		<SelectedScaleCircle
+			{selectedScale}
+			{bpm}
+			{rootNoteIndex}
+			{intervalPositionCircle}
+			{scaleNotePositionCircle}
+			availableModes={selectedModesGroup.modes}
+			{isEquivalentModing}
+			{notePositionCircle}
+		/>
 		<WesternChromaticCircle
 			{notePositionCircle}
 			{rootNoteIndex}
@@ -368,16 +275,15 @@
 		font: 30px sans-serif;
 	}
 
-
-	.scaleNote {
+	:global(.scaleNote) {
 		font-weight: bold;
 	}
 
-	.hidden {
+	:global(.hidden) {
 		opacity: 0;
 	}
 
-	.transitionAll {
+	:global(.transitionAll) {
 		-webkit-transition: all 500ms ease;
 		-moz-transition: all 500ms ease;
 		-ms-transition: all 500ms ease;
