@@ -1,4 +1,4 @@
-import type { Note } from '../types';
+import type { IntervalType, Note } from '../types';
 
 export const westernChromaticScale: Note[] = [
 	{ sharpNote: 'C', flatNote: 'C', defaultOctaveFrequency: 261.63 },
@@ -47,3 +47,11 @@ export const jamBassProbabilityDistributions = {
 };
 
 export const MINIMUM_BEAT_DIVISION = 0.25;
+
+export const prioritisedIntervalTypes: IntervalType[] = [
+	'perfect',
+	'major',
+	'minor',
+	'augmented',
+	'diminished'
+];

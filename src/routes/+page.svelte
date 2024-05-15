@@ -1,16 +1,14 @@
 <script setup lang="ts">
-	import { modeGroups, getIntervalLabel } from '../utils/modes';
-	import { getTriadTypeFromSelectedScale } from '../utils/triads';
-	import type { Circle, Note, ScaleNote } from '../types';
+	import { modeGroups } from '../utils/modes';
+	import type { Circle } from '../types';
 	import { getPositiveModulo } from '../utils/math';
 	import { westernChromaticScale } from '../utils/constants';
-	import { playNote, playInterval, playTriad } from '../utils/sounds';
 	import ScaleHeading from '../components/ScaleHeading.svelte';
-	import { getNoteString, isInScale } from '../utils/basicMusicTheory';
+	import { getNoteString } from '../utils/basicMusicTheory';
 	import MusicPlayers from '../components/MusicPlayers.svelte';
-	import { getNotePosition, getScaleNotePosition } from '../utils/svgLayout';
 	import WesternChromaticCircle from '../components/WesternChromaticCircle.svelte';
 	import SelectedScaleCircle from '../components/SelectedScaleCircle.svelte';
+	import FocussedComponentDescription from '../components/FocussedComponentDescription.svelte';
 
 	const visibleCircle: Circle = {
 		xCentre: 400,
@@ -204,6 +202,7 @@
 		</div>
 	</div>
 </div>
+<FocussedComponentDescription />
 
 <style>
 	@import '../themes/light.css';

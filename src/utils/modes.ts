@@ -50,66 +50,6 @@ const getScale = (startRelativeToIonian: number, intervals: number[]) => {
 	return scale;
 };
 
-export const getDiatonicIntervalLabel = (diff: number, intervalIndex: number) => {
-	const intervalN = intervalIndex + 1;
-
-	if (diff === 1) {
-		// Augmented
-		return `A${intervalN}`;
-	}
-
-	const perfectIntervals = [1, 4, 5];
-	if (perfectIntervals.includes(intervalN)) {
-		if (diff === 0) {
-			// Perfect
-			return `P${intervalN}`;
-		}
-		if (diff === -1) {
-			// Diminished
-			return `d${intervalN}`;
-		}
-	}
-	if (diff === 0) {
-		// Major
-		return `M${intervalN}`;
-	}
-	if (diff === -1) {
-		// Minor
-		return `m${intervalN}`;
-	}
-	if (diff === -2) {
-		// Diminished
-		return `d${intervalN}`;
-	}
-};
-
-export const getIntervalLabel = (scaleNote: ScaleNote, index: number) => {
-	const diff = scaleNote.semitonesFromRoot - sumIntervals(0, index, diatonicIntervals);
-	const diatonicIntervalLabel = getDiatonicIntervalLabel(diff, index);
-
-	if (diatonicIntervalLabel) {
-		return diatonicIntervalLabel;
-	}
-
-	let testDiatonicIndex = 0;
-
-	while (testDiatonicIndex < diatonicIntervals.length) {
-		const forcedDiatonicDiff =
-			scaleNote.semitonesFromRoot - sumIntervals(0, testDiatonicIndex, diatonicIntervals);
-		const forcedDiatonicIntervalLabel = getDiatonicIntervalLabel(
-			forcedDiatonicDiff,
-			testDiatonicIndex
-		);
-
-		if (forcedDiatonicIntervalLabel) {
-			return forcedDiatonicIntervalLabel;
-		}
-		testDiatonicIndex++;
-	}
-
-	return `${scaleNote.semitonesFromRoot}s`;
-};
-
 export const ionianScale = getScale(0, diatonicIntervals);
 export const dorianScale = getScale(1, diatonicIntervals);
 export const phrygianScale = getScale(2, diatonicIntervals);

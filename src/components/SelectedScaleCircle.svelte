@@ -1,11 +1,12 @@
 <script setup lang="ts">
 	import { westernChromaticScale } from '../utils/constants';
 	import { getPositiveModulo } from '../utils/math';
-	import { getIntervalLabel } from '../utils/modes';
+	import { getIntervalLabel } from '../utils/basicMusicTheory';
 	import { playTriad, playInterval } from '../utils/sounds';
 	import { getNotePosition, getScaleNotePosition } from '../utils/svgLayout';
 	import { getTriadTypeFromSelectedScale } from '../utils/triads';
-	import type { Circle, Scale } from '../types';
+	import type { Circle, Scale, ScaleNote } from '../types';
+	import { lastFocussedItems } from '../store';
 
 	export let selectedScale: Scale;
 	export let rootNoteIndex: number;
@@ -15,6 +16,17 @@
 	export let intervalPositionCircle: Circle;
 	export let scaleNotePositionCircle: Circle;
 	export let bpm: number;
+
+	const handleSelectInterval = (scaleNote: ScaleNote) => {
+		playInterval(scaleNote, rootNoteIndex, (60 * 1000) / bpm);
+		lastFocussedItems.update((focussedItems) => {
+			console.log('setting focussed Items', focussedItems, 'with', scaleNote);
+			return {
+				...focussedItems,
+				interval: scaleNote
+			};
+		});
+	};
 </script>
 
 {#each [...selectedScale.scale] as scaleNote, scaleNoteIndex}
@@ -86,9 +98,8 @@
 		</g>
 		<g
 			class="clickable"
-			on:click={() => playInterval(scaleNote, rootNoteIndex, (60 * 1000) / bpm)}
-			on:keydown={(e) =>
-				e.key === 'Enter' && playInterval(scaleNote, rootNoteIndex, (60 * 1000) / bpm)}
+			on:click={() => handleSelectInterval(scaleNote)}
+			on:keydown={(e) => e.key === 'Enter' && handleSelectInterval(scaleNote)}
 			tabindex="0"
 			aria-label={`Play ${getIntervalLabel(scaleNote, scaleNoteIndex)} interval`}
 			role="button"

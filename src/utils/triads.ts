@@ -1,4 +1,4 @@
-import type { ScaleNote, Triad, TriadType } from '../types';
+import type { RelativeTriad, ScaleNote, TriadType } from '../types';
 import { getPositiveModulo, sumIntervals } from './math';
 
 export const getTriadTypeFromSemitoneGaps = (
@@ -32,14 +32,14 @@ export const getTriadTypeFromSelectedScale = (
 	);
 };
 
-export const getTriadTypeFromTriad = (triad: Triad): TriadType => {
+export const getTriadTypeFromTriad = (triad: RelativeTriad): TriadType => {
 	return getTriadTypeFromSemitoneGaps(
 		triad.firstInterval.semitonesFromRoot,
 		triad.secondInterval.semitonesFromRoot
 	);
 };
 
-export const getTriad = (indexRelativeToIonian: number, intervals: number[]): Triad => {
+export const getTriad = (indexRelativeToIonian: number, intervals: number[]): RelativeTriad => {
 	return {
 		firstInterval: {
 			semitonesFromRoot: sumIntervals(indexRelativeToIonian, indexRelativeToIonian + 2, intervals)

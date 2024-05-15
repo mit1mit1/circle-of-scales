@@ -111,14 +111,6 @@ export const playNote = (
 							0) - 1,
 						0
 					);
-					console.log(
-						'removing',
-						getPositiveModulo(semitonesFromRoot, westernChromaticScale.length),
-						'from',
-						current,
-						'to give',
-						newNumber
-					);
 					return {
 						...current,
 						[getPositiveModulo(semitonesFromRoot, westernChromaticScale.length)]: newNumber

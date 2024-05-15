@@ -14,10 +14,14 @@ export interface ScaleNote {
 	label: string;
 }
 
-export interface Triad {
+export interface RelativeTriad {
 	firstInterval: Interval;
 	secondInterval: Interval;
 }
+
+export type Triad = RelativeTriad & {
+	rootNote: Note;
+};
 
 export type TriadType = 'major' | 'minor' | 'diminished' | 'bizarre';
 
@@ -53,3 +57,12 @@ export type ModeGroup = {
 		melody: number[];
 	};
 };
+
+export type LastFocussedItems = {
+	scale?: Scale;
+	note?: Note;
+	triad?: Triad;
+	interval?: Interval;
+};
+
+export type IntervalType = 'augmented' | 'perfect' | 'diminished' | 'major' | 'minor';
