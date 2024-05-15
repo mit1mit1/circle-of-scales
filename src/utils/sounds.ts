@@ -6,7 +6,6 @@ import {
 import type { InstrumentSettings, Interval, Note, ScaleNote } from '../types';
 import { currentlyPlayingRelativeToRoot } from '../store';
 import { getPositiveModulo } from './math';
-import { getTriad, getTriadTypeFromSemitoneGaps } from './modes';
 
 const DEFAULT_BEAT_DURATION = 300;
 const DEFAULT_NOTE_BEATS = 0.75;

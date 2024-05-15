@@ -45,3 +45,11 @@ export const romanize = (num: number): string => {
 	}
 	return Array(+digits.join('') + 1).join('M') + roman;
 };
+
+export const sumIntervals = (startIndex: number, endIndex: number, intervals: number[]) => {
+	let sum = 0;
+	for (let i = startIndex; i < endIndex; i++) {
+		sum += intervals[getPositiveModulo(i, intervals.length)];
+	}
+	return sum;
+};

@@ -19,7 +19,7 @@ export interface Triad {
 	secondInterval: Interval,
 }
 
-export type ChordType = 'major' | 'minor' | 'diminished' | 'bizarre';
+export type TriadType = 'major' | 'minor' | 'diminished' | 'bizarre';
 
 export type Circle = {
 	xCentre: number;

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-	import { modeGroups, getIntervalLabel, getTriadTypeFromSelectedScale } from '../utils/modes';
+	import { modeGroups, getIntervalLabel } from '../utils/modes';
+	import { getTriadTypeFromSelectedScale } from '../utils/triads';
 	import type { Circle, Note, ScaleNote } from '../types';
 	import { getPositiveModulo } from '../utils/math';
 	import { westernChromaticScale } from '../utils/constants';
@@ -160,7 +161,8 @@
 					on:click={() =>
 						playTriad(rootNoteIndex, scaleNoteIndex, selectedScale.scale, (60 * 1000) / bpm)}
 					on:keydown={(e) =>
-						e.key === 'Enter' && playTriad(rootNoteIndex, scaleNoteIndex, selectedScale.scale, (60 * 1000) / bpm)}
+						e.key === 'Enter' &&
+						playTriad(rootNoteIndex, scaleNoteIndex, selectedScale.scale, (60 * 1000) / bpm)}
 					tabindex="0"
 					aria-label={`Play ${
 						westernChromaticScale[
@@ -169,11 +171,7 @@
 								westernChromaticScale.length
 							)
 						]
-					} ${getTriadTypeFromSelectedScale(
-						rootNoteIndex,
-						scaleNoteIndex,
-						selectedScale.scale
-					)} triad`}
+					} ${getTriadTypeFromSelectedScale(scaleNoteIndex, selectedScale.scale)} triad`}
 					role="button"
 				>
 					<circle
@@ -199,7 +197,8 @@
 				<g
 					class="clickable"
 					on:click={() => playInterval(scaleNote, rootNoteIndex, (60 * 1000) / bpm)}
-					on:keydown={(e) => e.key === 'Enter' && playInterval(scaleNote, rootNoteIndex, (60 * 1000) / bpm)}
+					on:keydown={(e) =>
+						e.key === 'Enter' && playInterval(scaleNote, rootNoteIndex, (60 * 1000) / bpm)}
 					tabindex="0"
 					aria-label={`Play ${getIntervalLabel(scaleNote, scaleNoteIndex)} interval`}
 					role="button"
