@@ -1,8 +1,7 @@
 <script setup lang="ts">
-	import type { Circle, ScaleNote } from '../types';
+	import type { Circle, Note, ScaleNote } from '../types';
 	import { getNoteString, isInScale } from '../utils/basicMusicTheory';
 
-	import { westernChromaticScale } from '../utils/constants';
 	import { getPositiveModulo } from '../utils/math';
 	import { playNote } from '../utils/sounds';
 	import { getNotePosition } from '../utils/svgLayout';
@@ -11,6 +10,7 @@
 	export let notePositionCircle: Circle;
 	export let rootNoteIndex: number;
 	export let selectedScaleNotes: ScaleNote[];
+	export let chromaticNotes: Note[];
 
 	let highlightedRelativeToRoot: Record<string, number> = {};
 
@@ -19,22 +19,22 @@
 	});
 </script>
 
-{#each [...westernChromaticScale] as note, index}
+{#each [...chromaticNotes] as note, index}
 	{@const notePosition = getNotePosition(index, notePositionCircle)}
 	<g
 		class="clickable"
 		on:click={() =>
 			playNote(
-				westernChromaticScale[rootNoteIndex],
-				getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length),
+				chromaticNotes[rootNoteIndex],
+				getPositiveModulo(index - rootNoteIndex, chromaticNotes.length),
 				0,
 				500
 			)}
 		on:keydown={(e) =>
 			e.key === 'Enter' &&
 			playNote(
-				westernChromaticScale[rootNoteIndex],
-				getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length),
+				chromaticNotes[rootNoteIndex],
+				getPositiveModulo(index - rootNoteIndex, chromaticNotes.length),
 				0,
 				500
 			)}
@@ -59,12 +59,12 @@
 			transform={`translate(${notePosition.x} ${notePosition.y})`}
 			stroke="transparent"
 			fill={highlightedRelativeToRoot[
-				`${getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length)}`
+				`${getPositiveModulo(index - rootNoteIndex, chromaticNotes.length)}`
 			] > 0
 				? 'blue'
 				: 'var(--base-background-color)'}
 			opacity={(highlightedRelativeToRoot[
-				`${getPositiveModulo(index - rootNoteIndex, westernChromaticScale.length)}`
+				`${getPositiveModulo(index - rootNoteIndex, chromaticNotes.length)}`
 			] ?? 0) / 3}
 			class="transitionAllQuick"
 		/>

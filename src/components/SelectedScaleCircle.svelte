@@ -1,11 +1,10 @@
 <script setup lang="ts">
-	import { westernChromaticScale } from '../utils/constants';
 	import { getPositiveModulo } from '../utils/math';
 	import { getIntervalLabel } from '../utils/basicMusicTheory';
 	import { playTriad, playInterval } from '../utils/sounds';
 	import { getNotePosition, getScaleNotePosition } from '../utils/svgLayout';
 	import { getTriad, getTriadScaleNotes, getTriadTypeFromSelectedScale } from '../utils/triads';
-	import type { Circle, Scale, ScaleNote } from '../types';
+	import type { Circle, Note, Scale, ScaleNote } from '../types';
 	import { lastFocussedItems } from '../store';
 
 	export let selectedScale: Scale;
@@ -16,6 +15,7 @@
 	export let intervalPositionCircle: Circle;
 	export let scaleNotePositionCircle: Circle;
 	export let bpm: number;
+	export let chromaticNotes: Note[];
 
 	const handleSelectInterval = (scaleNote: ScaleNote) => {
 		playInterval(scaleNote, rootNoteIndex, (60 * 1000) / bpm);
@@ -33,10 +33,10 @@
 			return {
 				triad: {
 					rootNote:
-						westernChromaticScale[
+						chromaticNotes[
 							getPositiveModulo(
 								rootNoteIndex + selectedScale.scale[scaleNoteIndex].semitonesFromRoot,
-								westernChromaticScale.length
+								chromaticNotes.length
 							)
 						],
 					firstInterval: {
@@ -88,10 +88,10 @@
 			on:keydown={(e) => e.key === 'Enter' && handleSelectTriad(scaleNoteIndex)}
 			tabindex="0"
 			aria-label={`Play ${
-				westernChromaticScale[
+				chromaticNotes[
 					getPositiveModulo(
 						rootNoteIndex + scaleNote.semitonesFromRoot,
-						westernChromaticScale.length
+						chromaticNotes.length
 					)
 				]
 			} ${getTriadTypeFromSelectedScale(scaleNoteIndex, selectedScale.scale)} triad`}

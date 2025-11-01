@@ -2,13 +2,16 @@
 	import { modeGroups } from '../utils/modes';
 	import type { Circle } from '../types';
 	import { getPositiveModulo } from '../utils/math';
-	import { westernChromaticScale } from '../utils/constants';
+	import { westernChromaticScale, mitchsSixteenthScale } from '../utils/constants';
+
 	import ScaleHeading from '../components/ScaleHeading.svelte';
 	import { getNoteString } from '../utils/basicMusicTheory';
 	import MusicPlayers from '../components/MusicPlayers.svelte';
-	import WesternChromaticCircle from '../components/WesternChromaticCircle.svelte';
+	import ChromaticScaleCircle from '../components/ChromaticScaleCircle.svelte';
 	import SelectedScaleCircle from '../components/SelectedScaleCircle.svelte';
 	import FocussedComponentDescription from '../components/FocussedComponentDescription.svelte';
+
+	const chromaticNotes = mitchsSixteenthScale;
 
 	const visibleCircle: Circle = {
 		xCentre: 400,
@@ -62,11 +65,13 @@
 			availableModes={selectedModesGroup.modes}
 			{isEquivalentModing}
 			{notePositionCircle}
+			{chromaticNotes}
 		/>
-		<WesternChromaticCircle
+		<ChromaticScaleCircle
 			{notePositionCircle}
 			{rootNoteIndex}
 			selectedScaleNotes={selectedScale.scale}
+			{chromaticNotes}
 		/>
 	</svg>
 	<div class="boxOfButtons">
@@ -83,9 +88,7 @@
 				-
 			</button>
 			<span class="noteLabel">
-				{getNoteString(
-					westernChromaticScale[getPositiveModulo(rootNoteIndex, westernChromaticScale.length)]
-				)}
+				{getNoteString(chromaticNotes[getPositiveModulo(rootNoteIndex, chromaticNotes.length)])}
 			</span>
 			<button
 				on:click={() => {
@@ -124,16 +127,14 @@
 						<button
 							on:click={() => {
 								selectedScale = scale;
-								rootNoteIndex = getPositiveModulo(relativeIndex, westernChromaticScale.length);
+								rootNoteIndex = getPositiveModulo(relativeIndex, chromaticNotes.length);
 								isEquivalentModing = true;
 							}}
 							class={scale === selectedScale && isEquivalentModing ? 'selectedTab' : ''}
 						>
 							<span class="noteLabel"
 								>{getNoteString(
-									westernChromaticScale[
-										getPositiveModulo(relativeIndex, westernChromaticScale.length)
-									]
+									chromaticNotes[getPositiveModulo(relativeIndex, chromaticNotes.length)]
 								)}</span
 							>
 							{scale.name}
@@ -149,16 +150,14 @@
 						<button
 							on:click={() => {
 								selectedScale = scale;
-								rootNoteIndex = getPositiveModulo(relativeIndex, westernChromaticScale.length);
+								rootNoteIndex = getPositiveModulo(relativeIndex, chromaticNotes.length);
 								isEquivalentModing = false;
 							}}
 							class={scale === selectedScale && !isEquivalentModing ? 'selectedTab' : ''}
 						>
 							<span class="noteLabel"
 								>{getNoteString(
-									westernChromaticScale[
-										getPositiveModulo(relativeIndex, westernChromaticScale.length)
-									]
+									chromaticNotes[getPositiveModulo(relativeIndex, chromaticNotes.length)]
 								)}</span
 							>
 							{scale.name}
@@ -202,7 +201,6 @@
 		</div>
 		<FocussedComponentDescription />
 	</div>
-
 </div>
 
 <style>
