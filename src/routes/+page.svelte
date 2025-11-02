@@ -14,9 +14,9 @@
 	const chromaticNotes = mitchsTemperedScale;
 
 	const visibleCircle: Circle = {
-		xCentre: 400,
-		yCentre: 400,
-		radius: 300
+		xCentre: 800,
+		yCentre: 800,
+		radius: 600
 	};
 
 	let isEquivalentModing = true;

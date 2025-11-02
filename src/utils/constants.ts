@@ -17,7 +17,7 @@ export const westernChromaticScale: Note[] = [
 
 export const WesternAFrequency = 220;
 
-const temperedScaleLength = 31;
+const temperedScaleLength = 96;
 
 const getTemperedScale = (notesPerOctave: number) => {
 	const temperedScale = [];

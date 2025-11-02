@@ -183,6 +183,18 @@ export const t31Harmonics = [
 	}
 ];
 
+export const t96Approximation = [
+	6, 3, 3, 3, 1, 2, 2, 1, 2, 2, 2, 1, 3, 4, 1, 4, 4, 3, 5, 4, 5, 4, 6, 4, 3, 2, 1, 2, 1, 3, 4, 1, 4
+];
+// [3, 2, 3, 2, 3, 2, 3, 3, 4, 2]
+export const t96Harmonics = [
+	{
+		name: 't96Harmonics',
+		scale: getScale(0, t96Approximation),
+		rootIntervalToIonian: sumIntervals(0, 0, t96Approximation)
+	}
+];
+
 export const modeGroups: ModeGroup[] = [
 	{
 		label: 'Diatonic',
@@ -217,11 +229,19 @@ export const modeGroups: ModeGroup[] = [
 		}
 	},
 	{
-		label: 'Tn Scale',
+		label: 'T31 Scale',
 		modes: t31Harmonics,
 		probabilityDistributions: {
 			bass: getJamDistribution(t31Approximation.length + 1),
 			melody: getJamDistribution(t31Approximation.length + 1)
+		}
+	},
+	{
+		label: 'T96 Scale',
+		modes: t96Harmonics,
+		probabilityDistributions: {
+			bass: getJamDistribution(t96Approximation.length + 1),
+			melody: getJamDistribution(t96Approximation.length + 1)
 		}
 	}
 ];
