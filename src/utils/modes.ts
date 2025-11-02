@@ -2,10 +2,11 @@ import type { ModeGroup, Scale, ScaleNote } from '../types';
 import { getPositiveModulo, romanize, sumIntervals } from './math';
 import {
 	diatonicIntervals,
+	getJamDistribution,
 	hexatonicMinorBluesIntervals,
 	jamBassProbabilityDistributions,
 	jamMelodyProbabilityDistributions,
-	mitchsSixteenthScale,
+	mitchsTemperedScale,
 	pentatonicMajorIntervals
 } from './constants';
 import { getTriadTypeFromTriad, getTriad } from './triads';
@@ -139,9 +140,9 @@ const getChromaticIntervals = (notesPerOctave: number) => {
 	return intervals;
 };
 
-export const sixteenChromaticScale = getScale(
+export const mitchTemperedChromaticScale = getScale(
 	0,
-	getChromaticIntervals(mitchsSixteenthScale.length)
+	getChromaticIntervals(mitchsTemperedScale.length)
 );
 
 export const hexatonicMinorBlues = getScale(0, hexatonicMinorBluesIntervals);
@@ -167,8 +168,18 @@ export const minorHexatonicBluesModes = [
 export const sixteenChromaticModes = [
 	{
 		name: 'Minor',
-		scale: sixteenChromaticScale,
-		rootIntervalToIonian: sumIntervals(0, 0, getChromaticIntervals(mitchsSixteenthScale.length))
+		scale: mitchTemperedChromaticScale,
+		rootIntervalToIonian: sumIntervals(0, 0, getChromaticIntervals(mitchsTemperedScale.length))
+	}
+];
+
+export const t31Approximation = [3, 2, 3, 2, 3, 2, 3, 3, 4, 2, 4];
+// [3, 2, 3, 2, 3, 2, 3, 3, 4, 2]
+export const t31Harmonics = [
+	{
+		name: 't31Harmonics',
+		scale: getScale(0, t31Approximation),
+		rootIntervalToIonian: sumIntervals(0, 0, t31Approximation)
 	}
 ];
 
@@ -198,11 +209,19 @@ export const modeGroups: ModeGroup[] = [
 		}
 	},
 	{
-		label: '16 chromatic',
+		label: 'Mitch chromatic',
 		modes: sixteenChromaticModes,
 		probabilityDistributions: {
 			bass: jamBassProbabilityDistributions.mitchChromatic,
 			melody: jamMelodyProbabilityDistributions.mitchChromatic
+		}
+	},
+	{
+		label: 'Tn Scale',
+		modes: t31Harmonics,
+		probabilityDistributions: {
+			bass: getJamDistribution(t31Approximation.length + 1),
+			melody: getJamDistribution(t31Approximation.length + 1)
 		}
 	}
 ];

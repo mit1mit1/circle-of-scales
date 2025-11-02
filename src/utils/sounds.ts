@@ -1,7 +1,7 @@
 import {
 	MINIMUM_BEAT_DIVISION,
-	mitchsSixteenthScale,
-	mitchsSixteenthScaleSemitoneRatios,
+	mitchsTemperedScale,
+	equalTempermentRatios,
 	pythagoreanSemitoneRatios
 } from './constants';
 import type { InstrumentSettings, Interval, Note, ScaleNote } from '../types';
@@ -58,8 +58,8 @@ export const playNote = (
 	instrumentSettings: Partial<InstrumentSettings> = {}
 ) => {
 	const semitoneRatios =
-		chromaticNotes.length === mitchsSixteenthScale.length
-			? mitchsSixteenthScaleSemitoneRatios
+		chromaticNotes.length === mitchsTemperedScale.length
+			? equalTempermentRatios
 			: pythagoreanSemitoneRatios;
 	if (endTimeMilliseconds < startTimeMilliseconds) {
 		console.log('Warning: note end time earlier than start time');

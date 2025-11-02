@@ -2,7 +2,7 @@
 	import { modeGroups } from '../utils/modes';
 	import type { Circle } from '../types';
 	import { getPositiveModulo } from '../utils/math';
-	import { westernChromaticScale, mitchsSixteenthScale } from '../utils/constants';
+	import { westernChromaticScale, mitchsTemperedScale } from '../utils/constants';
 
 	import ScaleHeading from '../components/ScaleHeading.svelte';
 	import { getNoteString } from '../utils/basicMusicTheory';
@@ -11,7 +11,7 @@
 	import SelectedScaleCircle from '../components/SelectedScaleCircle.svelte';
 	import FocussedComponentDescription from '../components/FocussedComponentDescription.svelte';
 
-	const chromaticNotes = mitchsSixteenthScale;
+	const chromaticNotes = mitchsTemperedScale;
 
 	const visibleCircle: Circle = {
 		xCentre: 400,
