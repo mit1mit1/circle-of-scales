@@ -1,5 +1,5 @@
 import type { IntervalType, Note, ScaleNote } from '../types';
-import { diatonicIntervals, prioritisedIntervalTypes, westernChromaticScale } from './constants';
+import { diatonicIntervals, prioritisedIntervalTypes } from './constants';
 import { getOrdinalSuffixed, getPositiveModulo, sumIntervals } from './math';
 
 export const getNoteString = (note: Note) => {
@@ -9,13 +9,15 @@ export const getNoteString = (note: Note) => {
 	return note.flatNote;
 };
 
-export const isInScale = (noteIndex: number, rootNoteIndex: number, scale: ScaleNote[]) => {
-	let semitonesFromRoot = getPositiveModulo(
-		noteIndex - rootNoteIndex,
-		westernChromaticScale.length
-	);
+export const isInScale = (
+	noteIndex: number,
+	rootNoteIndex: number,
+	scale: ScaleNote[],
+	notesPerOctave: number
+) => {
+	let semitonesFromRoot = getPositiveModulo(noteIndex - rootNoteIndex, notesPerOctave);
 	if (semitonesFromRoot < 0) {
-		semitonesFromRoot = semitonesFromRoot + westernChromaticScale.length;
+		semitonesFromRoot = semitonesFromRoot + notesPerOctave;
 	}
 	return scale.some((scaleNote) => scaleNote.semitonesFromRoot === semitonesFromRoot);
 };

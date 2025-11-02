@@ -18,7 +18,7 @@
 	export let chromaticNotes: Note[];
 
 	const handleSelectInterval = (scaleNote: ScaleNote) => {
-		playInterval(scaleNote, rootNoteIndex, (60 * 1000) / bpm);
+		playInterval(scaleNote, rootNoteIndex, chromaticNotes, (60 * 1000) / bpm);
 		lastFocussedItems.update((focussedItems) => {
 			return {
 				interval: scaleNote
@@ -27,9 +27,19 @@
 	};
 
 	const handleSelectTriad = (scaleNoteIndex: number) => {
-		playTriad(rootNoteIndex, scaleNoteIndex, selectedScale.scale, (60 * 1000) / bpm);
+		playTriad(
+			rootNoteIndex,
+			scaleNoteIndex,
+			chromaticNotes,
+			selectedScale.scale,
+			(60 * 1000) / bpm
+		);
 		lastFocussedItems.update((focussedItems) => {
-			const triadScaleNotes = getTriadScaleNotes(scaleNoteIndex, selectedScale.scale);
+			const triadScaleNotes = getTriadScaleNotes(
+				scaleNoteIndex,
+				selectedScale.scale,
+				chromaticNotes
+			);
 			return {
 				triad: {
 					rootNote:
@@ -62,15 +72,26 @@
 						selectedScale.scale.length
 					)
 				].semitonesFromRoot + rootNoteIndex,
-				notePositionCircle
+				notePositionCircle,
+				chromaticNotes.length
 		  )
-		: getNotePosition(scaleNote.semitonesFromRoot + rootNoteIndex, notePositionCircle)}
+		: getNotePosition(
+				scaleNote.semitonesFromRoot + rootNoteIndex,
+				notePositionCircle,
+				chromaticNotes.length
+		  )}
 	{@const scaleNotePosition = getScaleNotePosition(
 		scaleNote,
 		rootNoteIndex,
-		scaleNotePositionCircle
+		scaleNotePositionCircle,
+		chromaticNotes.length
 	)}
-	{@const intervalPosition = getScaleNotePosition(scaleNote, rootNoteIndex, intervalPositionCircle)}
+	{@const intervalPosition = getScaleNotePosition(
+		scaleNote,
+		rootNoteIndex,
+		intervalPositionCircle,
+		chromaticNotes.length
+	)}
 	<circle
 		style="stroke-width:1.6871;stroke-miterlimit:10;"
 		cx={0}
@@ -89,10 +110,7 @@
 			tabindex="0"
 			aria-label={`Play ${
 				chromaticNotes[
-					getPositiveModulo(
-						rootNoteIndex + scaleNote.semitonesFromRoot,
-						chromaticNotes.length
-					)
+					getPositiveModulo(rootNoteIndex + scaleNote.semitonesFromRoot, chromaticNotes.length)
 				]
 			} ${getTriadTypeFromSelectedScale(scaleNoteIndex, selectedScale.scale)} triad`}
 			role="button"

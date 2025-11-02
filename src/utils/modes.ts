@@ -5,6 +5,7 @@ import {
 	hexatonicMinorBluesIntervals,
 	jamBassProbabilityDistributions,
 	jamMelodyProbabilityDistributions,
+	mitchsSixteenthScale,
 	pentatonicMajorIntervals
 } from './constants';
 import { getTriadTypeFromTriad, getTriad } from './triads';
@@ -130,6 +131,19 @@ export const majorPentatonicModes = [
 	}
 ];
 
+const getChromaticIntervals = (notesPerOctave: number) => {
+	const intervals: number[] = [];
+	for (let i = 0; i < notesPerOctave; i++) {
+		intervals.push(1);
+	}
+	return intervals;
+};
+
+export const sixteenChromaticScale = getScale(
+	0,
+	getChromaticIntervals(mitchsSixteenthScale.length)
+);
+
 export const hexatonicMinorBlues = getScale(0, hexatonicMinorBluesIntervals);
 export const hexatonicMajorBlues = getScale(1, hexatonicMinorBluesIntervals);
 export const blues3 = getScale(2, hexatonicMinorBluesIntervals);
@@ -147,6 +161,14 @@ export const minorHexatonicBluesModes = [
 		name: 'Major',
 		scale: hexatonicMajorBlues,
 		rootIntervalToIonian: sumIntervals(0, 1, hexatonicMinorBluesIntervals)
+	}
+];
+
+export const sixteenChromaticModes = [
+	{
+		name: 'Minor',
+		scale: sixteenChromaticScale,
+		rootIntervalToIonian: sumIntervals(0, 0, getChromaticIntervals(mitchsSixteenthScale.length))
 	}
 ];
 
@@ -173,6 +195,14 @@ export const modeGroups: ModeGroup[] = [
 		probabilityDistributions: {
 			bass: jamBassProbabilityDistributions.hexatonic,
 			melody: jamMelodyProbabilityDistributions.hexatonic
+		}
+	},
+	{
+		label: '16 chromatic',
+		modes: sixteenChromaticModes,
+		probabilityDistributions: {
+			bass: jamBassProbabilityDistributions.mitchChromatic,
+			melody: jamMelodyProbabilityDistributions.mitchChromatic
 		}
 	}
 ];

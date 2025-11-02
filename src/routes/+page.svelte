@@ -44,7 +44,7 @@
 	let bpm = 70;
 </script>
 
-<ScaleHeading {rootNoteIndex} selectedScaleName={selectedScale.name} />
+<ScaleHeading {rootNoteIndex} selectedScaleName={selectedScale.name} {chromaticNotes} />
 <div class="appContainer" data-sveltekit-preload-data="hover">
 	<svg id="boxOfNotes" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
 		<circle
@@ -172,6 +172,7 @@
 				{rootNoteIndex}
 				{selectedModesGroup}
 				selectedScaleNotes={selectedScale.scale}
+				{chromaticNotes}
 			/>
 		</div>
 		<div class="musicControls">

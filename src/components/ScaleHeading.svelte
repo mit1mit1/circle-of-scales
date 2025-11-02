@@ -1,16 +1,15 @@
 <script setup lang="ts">
+	import type { Note } from '../types';
 	import { getNoteString } from '../utils/basicMusicTheory';
-	import { westernChromaticScale } from '../utils/constants';
 	import { getPositiveModulo } from '../utils/math';
 
 	export let rootNoteIndex: number;
 	export let selectedScaleName: string;
+	export let chromaticNotes: Note[];
 </script>
 
 <h1>
-	{getNoteString(
-		westernChromaticScale[getPositiveModulo(rootNoteIndex, westernChromaticScale.length)]
-	)}
+	{getNoteString(chromaticNotes[getPositiveModulo(rootNoteIndex, chromaticNotes.length)])}
 	{selectedScaleName}
 </h1>
 

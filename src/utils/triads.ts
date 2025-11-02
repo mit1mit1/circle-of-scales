@@ -1,5 +1,4 @@
-import type { RelativeTriad, ScaleNote, TriadType } from '../types';
-import { westernChromaticScale } from './constants';
+import type { Note, RelativeTriad, ScaleNote, TriadType } from '../types';
 import { getPositiveModulo, sumIntervals } from './math';
 
 export const getTriadTypeFromSemitoneGaps = (
@@ -51,7 +50,11 @@ export const getTriad = (indexRelativeToIonian: number, intervals: number[]): Re
 	};
 };
 
-export const getTriadScaleNotes = (scaleNoteIndex: number, selectedScale: ScaleNote[]) => {
+export const getTriadScaleNotes = (
+	scaleNoteIndex: number,
+	selectedScale: ScaleNote[],
+	chromaticNotes: Note[]
+) => {
 	const scaleNotes = [
 		{ ...selectedScale[scaleNoteIndex] },
 		{ ...selectedScale[getPositiveModulo(scaleNoteIndex + 2, selectedScale.length)] },
@@ -63,7 +66,7 @@ export const getTriadScaleNotes = (scaleNoteIndex: number, selectedScale: ScaleN
 			return;
 		}
 		if (scaleNote.semitonesFromRoot < scaleNotes[index - 1].semitonesFromRoot) {
-			scaleNote.semitonesFromRoot += westernChromaticScale.length;
+			scaleNote.semitonesFromRoot += chromaticNotes.length;
 		}
 		return;
 	});

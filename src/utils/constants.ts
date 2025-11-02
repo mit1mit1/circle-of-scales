@@ -40,25 +40,25 @@ export const mitchsSixteenthScale: Note[] = [
 		preferSharp: true,
 		defaultOctaveFrequency: (WesternAFrequency * 22) / 16
 	},
-	{ sharpNote: 'o', flatNote: 'o', defaultOctaveFrequency: (WesternAFrequency * 23) / 16 },
-	{
-		sharpNote: 'p',
-		flatNote: 'p',
-		preferSharp: false,
-		defaultOctaveFrequency: (WesternAFrequency * 24) / 16
-	},
-	{ sharpNote: 'q', flatNote: 'q', defaultOctaveFrequency: (WesternAFrequency * 25) / 16 },
-	{
-		sharpNote: 'r',
-		flatNote: 'r',
-		preferSharp: false,
-		defaultOctaveFrequency: (WesternAFrequency * 26) / 16
-	},
-	{ sharpNote: 's', flatNote: 's', defaultOctaveFrequency: (WesternAFrequency * 27) / 16 },
-	{ sharpNote: 't', flatNote: 't', defaultOctaveFrequency: (WesternAFrequency * 28) / 16 },
-	{ sharpNote: 'u', flatNote: 'u', defaultOctaveFrequency: (WesternAFrequency * 29) / 16 },
-	{ sharpNote: 'v', flatNote: 'v', defaultOctaveFrequency: (WesternAFrequency * 30) / 16 },
-	{ sharpNote: 'w', flatNote: 'w', defaultOctaveFrequency: (WesternAFrequency * 31) / 16 }
+	{ sharpNote: 'o', flatNote: 'o', defaultOctaveFrequency: (WesternAFrequency * 23) / 16 }
+	// {
+	// 	sharpNote: 'p',
+	// 	flatNote: 'p',
+	// 	preferSharp: false,
+	// 	defaultOctaveFrequency: (WesternAFrequency * 24) / 16
+	// },
+	// { sharpNote: 'q', flatNote: 'q', defaultOctaveFrequency: (WesternAFrequency * 25) / 16 },
+	// {
+	// 	sharpNote: 'r',
+	// 	flatNote: 'r',
+	// 	preferSharp: false,
+	// 	defaultOctaveFrequency: (WesternAFrequency * 26) / 16
+	// },
+	// { sharpNote: 's', flatNote: 's', defaultOctaveFrequency: (WesternAFrequency * 27) / 16 },
+	// { sharpNote: 't', flatNote: 't', defaultOctaveFrequency: (WesternAFrequency * 28) / 16 },
+	// { sharpNote: 'u', flatNote: 'u', defaultOctaveFrequency: (WesternAFrequency * 29) / 16 },
+	// { sharpNote: 'v', flatNote: 'v', defaultOctaveFrequency: (WesternAFrequency * 30) / 16 },
+	// { sharpNote: 'w', flatNote: 'w', defaultOctaveFrequency: (WesternAFrequency * 31) / 16 }
 ];
 
 export const diatonicIntervals = [2, 2, 1, 2, 2, 2, 1];
@@ -80,16 +80,62 @@ export const pythagoreanSemitoneRatios = [
 	243 / 128
 ];
 
+// export const mitchsSixteenthScaleSemitoneRatios = [
+// 	1,
+// 	17 / 16,
+// 	18 / 16,
+// 	19 / 16,
+// 	20 / 16,
+// 	21 / 16,
+// 	22 / 16,
+// 	23 / 16,
+// 	24 / 16,
+// 	25 / 16,
+// 	26 / 16,
+// 	27 / 16,
+// 	28 / 16,
+// 	29 / 16,
+// 	30 / 16,
+// 	31 / 16
+// ];
+
+export const mitchsHarmonicScaleSemitoneRatios = [
+	1,
+	// 1 + 1 / 8,
+	// 1 + 1 / 7,
+	// 1 + 1 / 6,
+	1 + 1 / 5,
+	1 + 1 / 4,
+	1 + 1 / 3,
+	1 + 1 / 2
+];
+
+export const mitchsSixteenthScaleSemitoneRatios = [
+	1,
+	2 ** (1 / 8),
+	2 ** (1 / 4),
+	2 ** (3 / 8),
+	2 ** (1 / 2),
+	2 ** (5 / 8),
+	2 ** (3 / 4),
+	2 ** (7 / 8)
+	//2 ** 1,
+];
+
 export const jamMelodyProbabilityDistributions = {
 	pentatonic: [0.3, 0.05, 0.05, 0.2, 0.1],
 	diatonic: [0.3, 0.05, 0.15, 0.05, 0.075, 0.05, 0.03],
-	hexatonic: [0.3, 0.075, 0.15, 0.075, 0.075, 0.05]
+	hexatonic: [0.3, 0.075, 0.15, 0.075, 0.075, 0.05],
+	// mitchChromatic: [0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+	mitchChromatic: [0.3, 0.2, 0.2, 0.1, 0.2]
 };
 
 export const jamBassProbabilityDistributions = {
 	pentatonic: [0.5, 0.05, 0.15, 0.2, 0.05],
 	diatonic: [0.5, 0.02, 0.05, 0.1, 0.1, 0.05, 0.02],
-	hexatonic: [0.5, 0.02, 0.05, 0.1, 0.1, 0.05]
+	hexatonic: [0.5, 0.02, 0.05, 0.1, 0.1, 0.05],
+	// mitchChromatic: [0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+	mitchChromatic: [0.3, 0.2, 0.2, 0.1, 0.2]
 };
 
 export const MINIMUM_BEAT_DIVISION = 0.25;

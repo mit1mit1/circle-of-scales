@@ -20,13 +20,14 @@
 </script>
 
 {#each [...chromaticNotes] as note, index}
-	{@const notePosition = getNotePosition(index, notePositionCircle)}
+	{@const notePosition = getNotePosition(index, notePositionCircle, chromaticNotes.length)}
 	<g
 		class="clickable"
 		on:click={() =>
 			playNote(
 				chromaticNotes[rootNoteIndex],
 				getPositiveModulo(index - rootNoteIndex, chromaticNotes.length),
+				chromaticNotes,
 				0,
 				500
 			)}
@@ -35,6 +36,7 @@
 			playNote(
 				chromaticNotes[rootNoteIndex],
 				getPositiveModulo(index - rootNoteIndex, chromaticNotes.length),
+				chromaticNotes,
 				0,
 				500
 			)}
@@ -72,7 +74,9 @@
 			x={notePosition.x}
 			y={notePosition.y}
 			class={`svgNoteName ${
-				isInScale(index, rootNoteIndex, selectedScaleNotes) ? 'svgSelectedNoteName' : ''
+				isInScale(index, rootNoteIndex, selectedScaleNotes, chromaticNotes.length)
+					? 'svgSelectedNoteName'
+					: ''
 			}`}
 			text-anchor="middle"
 			dy=".3em"
