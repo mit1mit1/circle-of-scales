@@ -1,4 +1,5 @@
 import type { IntervalType, Note } from '../types';
+import { getPositiveModulo } from './math';
 
 export const westernChromaticScale: Note[] = [
 	{ sharpNote: 'C', flatNote: 'C', defaultOctaveFrequency: 261.63 },
@@ -15,9 +16,9 @@ export const westernChromaticScale: Note[] = [
 	{ sharpNote: 'A', flatNote: 'B', defaultOctaveFrequency: 246.94 }
 ];
 
-export const WesternAFrequency = 220;
+export const WesternAFrequency = 110;
 
-const temperedScaleLength = 96;
+const temperedScaleLength = 6;
 
 const getTemperedScale = (notesPerOctave: number) => {
 	const temperedScale = [];
@@ -33,7 +34,26 @@ const getTemperedScale = (notesPerOctave: number) => {
 	return temperedScale;
 };
 
-export const mitchsTemperedScale: Note[] = getTemperedScale(temperedScaleLength);
+const interestingHarmonics = [1, 1 + 1 / 5, 1 + 2 / 5, 1 + 3 / 5, 1 + 4 / 5, 2];
+
+const getHarmonicsScale = (notesPerOctave: number) => {
+	const temperedScale = [];
+	let noteName = 'α';
+	for (let i = 0; i < notesPerOctave; i++) {
+		temperedScale.push({
+			sharpNote: noteName,
+			flatNote: noteName,
+			defaultOctaveFrequency:
+				WesternAFrequency *
+				(1 + interestingHarmonics[getPositiveModulo(i, interestingHarmonics.length)])
+		});
+		noteName = String.fromCharCode(noteName.charCodeAt(0) + 1);
+	}
+	return temperedScale;
+};
+
+// export const mitchsTemperedScale: Note[] = getTemperedScale(temperedScaleLength);
+export const mitchsTemperedScale: Note[] = getHarmonicsScale(temperedScaleLength);
 // [
 // 	{ sharpNote: 'h', flatNote: 'h', defaultOctaveFrequency: WesternAFrequency },
 // 	{
@@ -121,10 +141,10 @@ export const mitchsHarmonicScaleSemitoneRatios = [
 	// 1 + 1 / 8,
 	// 1 + 1 / 7,
 	// 1 + 1 / 6,
-	1 + 1 / 5,
-	1 + 1 / 4,
-	1 + 1 / 3,
-	1 + 1 / 2
+	1 + 1 / 7,
+	1 + 2 / 7,
+	1 + 3 / 7,
+	1 + 4 / 7
 ];
 
 // export const equalTempermentRatios = [
@@ -147,7 +167,19 @@ const getEqualTempermentRatios = (notesPerOctave: number) => {
 	return equalTempermentRatios;
 };
 
-export const equalTempermentRatios = getEqualTempermentRatios(mitchsTemperedScale.length);
+const getHarmonicsTempermentRatios = (notesPerOctave: number) => {
+	const harmonicsRatios = [];
+	for (let i = 0; i < notesPerOctave; i++) {
+		harmonicsRatios.push(
+			1 + interestingHarmonics[getPositiveModulo(i, interestingHarmonics.length)]
+		);
+	}
+	return harmonicsRatios;
+};
+
+// export const equalTempermentRatios = getEqualTempermentRatios(mitchsTemperedScale.length);
+export const equalTempermentRatios = getHarmonicsTempermentRatios(mitchsTemperedScale.length);
+// export const interestingHarmonicsRatios = getHarmonicsTempermentRatios(mitchsTemperedScale.length);
 // Standard western case
 // [
 // 	(1,
@@ -168,9 +200,9 @@ export const equalTempermentRatios = getEqualTempermentRatios(mitchsTemperedScal
 export const getJamDistribution = (notesPerOctave: number) => {
 	const distribution = [];
 	for (let i = 0; i < notesPerOctave; i++) {
-		distribution.push(0.9 / notesPerOctave);
+		distribution.push(0.7 / notesPerOctave);
 	}
-	distribution[0] += 0.1;
+	distribution[0] += 0.3;
 	return distribution;
 };
 

@@ -11,7 +11,7 @@ import { getTriadScaleNotes } from './triads';
 
 const DEFAULT_BEAT_DURATION = 300;
 const DEFAULT_NOTE_BEATS = 0.75;
-const DEFAULT_JAM_LENGTH_BEATS = 12;
+const DEFAULT_JAM_LENGTH_BEATS = 240;
 
 const MINIMUM_GAIN = 0.000001;
 
@@ -362,28 +362,41 @@ export const jam = (
 			if (Math.random() < melodyProbabilities[index]) {
 				const durationSeed = Math.random();
 				let durationMultiplier = 1;
-				if (durationSeed > 0.8) {
+				if (durationSeed > 0.6) {
 					durationMultiplier = 2;
 				}
-				if (durationSeed > 0.9) {
+				if (durationSeed > 0.8) {
 					durationMultiplier = 4;
 				}
-				if (durationSeed > 0.95) {
+				if (durationSeed > 0.9) {
 					durationMultiplier = 6;
 				}
-				if (durationSeed > 0.97) {
+				if (durationSeed > 0.95) {
 					durationMultiplier = 3;
 				}
-				if (durationSeed > 0.99) {
+				if (durationSeed > 0.97) {
 					durationMultiplier = 8;
 				}
 				playNote(
 					chromaticNotes[rootNoteIndex],
-					scaleNote.semitonesFromRoot + chromaticNotes.length,
+					scaleNote.semitonesFromRoot,
 					chromaticNotes,
 					beatDuration * currentMelodyBeat,
 					beatDuration * currentMelodyBeat +
-						beatDuration * MINIMUM_BEAT_DIVISION * durationMultiplier
+						beatDuration * MINIMUM_BEAT_DIVISION * 2 * durationMultiplier,
+					{
+						attackTime: 0.6,
+						maxGain: 0.1,
+						sustainGainRatio: 0.1,
+						oscillatorType: 'sine',
+						// maxSustainTime: beatDuration * MINIMUM_BEAT_DIVISION * durationMultiplier,
+						decayTime: 0.5,
+						releaseTime: 1.2,
+						maxSustainTime: 2.8
+						// oscillatorType: 'sine',
+						// sustainGainRatio: 0.5,
+						// maxGain: 0.0125
+					}
 				);
 				currentMelodyBeat += MINIMUM_BEAT_DIVISION;
 			}
@@ -422,7 +435,20 @@ export const jam = (
 					chromaticNotes,
 					beatDuration * currentBassBeat,
 					beatDuration * currentBassBeat +
-						beatDuration * 2 * MINIMUM_BEAT_DIVISION * durationMultiplier
+						beatDuration * 2 * MINIMUM_BEAT_DIVISION * durationMultiplier,
+					{
+						attackTime: 0.3,
+						maxGain: 0.1,
+						sustainGainRatio: 0.1,
+						oscillatorType: 'sine',
+						// maxSustainTime: beatDuration * MINIMUM_BEAT_DIVISION * durationMultiplier,
+						decayTime: 0.5,
+						releaseTime: 1.2,
+						maxSustainTime: 2.8
+						// oscillatorType: 'sine',
+						// sustainGainRatio: 0.5,
+						// maxGain: 0.0125
+					}
 				);
 				currentBassBeat += 2 * MINIMUM_BEAT_DIVISION;
 			}
