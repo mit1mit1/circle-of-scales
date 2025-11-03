@@ -219,29 +219,29 @@ export const modeGroups: ModeGroup[] = [
 			bass: jamBassProbabilityDistributions.hexatonic,
 			melody: jamMelodyProbabilityDistributions.hexatonic
 		}
-	},
-	{
-		label: 'Mitch chromatic',
-		modes: sixteenChromaticModes,
-		probabilityDistributions: {
-			bass: jamBassProbabilityDistributions.mitchChromatic,
-			melody: jamMelodyProbabilityDistributions.mitchChromatic
-		}
-	},
-	{
-		label: 'T31 Scale',
-		modes: t31Harmonics,
-		probabilityDistributions: {
-			bass: getJamDistribution(t31Approximation.length + 1),
-			melody: getJamDistribution(t31Approximation.length + 1)
-		}
-	},
-	{
-		label: 'T96 Scale',
-		modes: t96Harmonics,
-		probabilityDistributions: {
-			bass: getJamDistribution(t96Approximation.length + 1),
-			melody: getJamDistribution(t96Approximation.length + 1)
-		}
 	}
+	// {
+	// 	label: 'Mitch chromatic',
+	// 	modes: sixteenChromaticModes,
+	// 	probabilityDistributions: {
+	// 		bass: jamBassProbabilityDistributions.mitchChromatic,
+	// 		melody: jamMelodyProbabilityDistributions.mitchChromatic
+	// 	}
+	// }
+	// {
+	// 	label: 'T31 Scale',
+	// 	modes: t31Harmonics,
+	// 	probabilityDistributions: {
+	// 		bass: getJamDistribution(t31Approximation.length + 1),
+	// 		melody: getJamDistribution(t31Approximation.length + 1)
+	// 	}
+	// },
+	// {
+	// 	label: 'T96 Scale',
+	// 	modes: t96Harmonics,
+	// 	probabilityDistributions: {
+	// 		bass: getJamDistribution(t96Approximation.length + 1),
+	// 		melody: getJamDistribution(t96Approximation.length + 1)
+	// 	}
+	// }
 ];

@@ -11,12 +11,12 @@
 	import SelectedScaleCircle from '../components/SelectedScaleCircle.svelte';
 	import FocussedComponentDescription from '../components/FocussedComponentDescription.svelte';
 
-	const chromaticNotes = mitchsTemperedScale;
+	const chromaticNotes = westernChromaticScale;
 
 	const visibleCircle: Circle = {
-		xCentre: 800,
-		yCentre: 800,
-		radius: 600
+		xCentre: 400,
+		yCentre: 400,
+		radius: 300
 	};
 
 	let isEquivalentModing = true;
